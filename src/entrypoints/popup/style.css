@@ -1,0 +1,66 @@
+html {
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", "Liberation Sans", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+}
+
+:root {
+  --body-padding: 16px;
+  --background: #14161b
+}
+
+body {
+  width: 280px;
+  height: 450px;
+  background-color: var(--background);
+  color: #fff;
+  padding: var(--body-padding);
+}
+
+#root {
+  height: 100%;
+}
+
+.text-justify {
+  text-align: justify;
+}
+
+.subtitle {
+  font-size: 12px;
+}
+
+/* This mimics the bootstrap theme Cardmarket uses, to keep it consistent */
+.btn-primary {
+  color: #012169 !important;
+  background-color: #e4e6eb;
+  border-color: #e4e6eb;
+  --bs-btn-color: #ffffff;
+  --bs-btn-bg: #012169;
+  --bs-btn-border-color: #012169;
+  --bs-btn-hover-color: #ffffff;
+  --bs-btn-hover-bg: rgb(0.85, 28.05, 89.25);
+  --bs-btn-hover-border-color: rgb(0.8, 26.4, 84);
+  --bs-btn-focus-shadow-rgb: 39, 66, 128;
+  --bs-btn-active-color: #ffffff;
+  --bs-btn-active-bg: rgb(0.8, 26.4, 84);
+  --bs-btn-active-border-color: rgb(0.75, 24.75, 78.75);
+  --bs-btn-active-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
+  --bs-btn-disabled-color: #ffffff;
+  --bs-btn-disabled-bg: #012169;
+  --bs-btn-disabled-border-color: #012169;
+  text-decoration: solid;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+.btn-primary:hover {
+  background-color: white;
+}
+
+.mb-neg-8 {
+  margin-bottom: -8px;
+}
+
+.inline-icon {
+  height: 16px;
+  margin-right: 2px;
+  margin-bottom: 2px;
+}

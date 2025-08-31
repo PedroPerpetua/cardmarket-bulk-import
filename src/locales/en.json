@@ -1,0 +1,89 @@
+{
+    "popup": {
+        "title": "Cardmarket Bulk Import",
+        "panels": {
+            "instructions": {
+                "button": "How to use",
+                "title": "How to use",
+                "step_1_a": "Navigate to the \"Bulk List Cards\" and filter by the set you want to upload cards from. ",
+                "step_1_b": "Here",
+                "step_1_c": "'s a quick link!",
+                "step_2": "Press the \"Import CSV...\" button injected by this extension. It should be right below the \"Bulk Modification\" menu.",
+                "step_3": "Select your file and match the columns in the CSV to the columns in Cardmarket.",
+                "step_4": "Press \"Fill page!\". The extension will automatically fill in the table with the cards it can match!",
+                "note_a": "NOTE",
+                "note_b": ": Cardmarket only allows 100 listings per upload, so your file might need to be split into ",
+                "note_c": "batches",
+                "note_d": " of 100 rows. You should submit one batch at a time (which means you may need to repeat this process multiple times for large files)."
+            },
+            "reportIssue": {
+                "button": "Report an issue",
+                "title": "Report an issue",
+                "github_a": "If you've found a problem while using this extension you can report it in the ",
+                "github_b": "Github issues",
+                "github_c": ".",
+                "github_d": "Please make sure to include the name of the browser where you found the issue, and the version you are using (v$1)."
+            },
+            "aboutMe": {
+                "button": "About",
+                "title": "About",
+                "header": "Cardmarket Bulk Import extension",
+                "subheader": "by PedroPerpetua",
+                "website": "My website: ",
+                "github": "Public repository: ",
+                "cardmarket": "My seller's account: ",
+                "kofi": "Like my work?",
+                "kofi_subtitle_1": "A donation is completely optional.",
+                "kofi_subtitle_2": "This extension is 100% free."
+            },
+            "disclaimer_a": "Not affiliated or endorsed by Cardmarket.",
+            "disclaimer_b": "Use at own risk."
+        }
+    },
+    "injected-button": {
+        "button": "Import CSV...",
+        "modal": {
+            "title": "Import listings from CSV",
+            "form": {
+                "files": {
+                    "label": "CSV File",
+                    "required": "You must upload a file."
+                },
+                "batch": {
+                    "label": "Batch",
+                    "tooltip": "Cardmarket can not process more than 100 entries per bulk list; your file has more than 100 entries, so it will be split into batches.",
+                    "required": "You must select a batch"
+                },
+                "nameColumn": {
+                    "label": "Name Column",
+                    "required": "You must select a column"
+                },
+                "quantityColumn": {
+                    "label": "Quantity Column"
+                },
+                "foilColumn": {
+                    "label": "Foil Column"
+                },
+                "priceColumn": {
+                    "label": "Price Column"
+                },
+                "submit": "Fill page!"
+            }
+        },
+        "success": {
+            "title": "Listings imported successfully!",
+            "body": {
+                "1": "1 row was imported!",
+                "n": "$1 rows were imported!"
+            },
+            "table": {
+                "numberColumn": "#",
+                "nameColumn": "Name",
+                "quantityColumn": "Quantity",
+                "foilColumn": "Foil",
+                "priceColumn": "Price"
+            },
+            "close": "Close"
+        }
+    }
+}

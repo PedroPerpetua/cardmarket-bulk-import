@@ -1,0 +1,6 @@
+- Support more import formats.
+- Support "copy and paste" a CSV directly onto the form.
+- Support more properties (language, signed, etc).
+- Loading state for async file reading, so that we don't block on large files.
+- Import history / better way to go trough multiple batches.
+- Verify results before filling up.
