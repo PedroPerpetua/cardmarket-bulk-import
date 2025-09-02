@@ -59,6 +59,11 @@ export type Result = {
   price: number,
 };
 
+// Selectors for the fields from the tr Element for each row
+const quantityElSelector = 'td input[name^="amount"]';
+const foilElSelector = 'td input[name^="isFoil"]';
+const priceElSelector = 'td input[name^="price"]';
+
 export async function fillPage(file: File, columns: Record<Column, string>, batch: number) {
   const data = await readCSV(file);
   const rows = [...document.querySelectorAll('td div.col-product.text-start a').values()];
@@ -74,38 +79,38 @@ export async function fillPage(file: File, columns: Record<Column, string>, batc
     if (!nameEl) return;
     // a -> div -> td -> tr
     let trEl = nameEl.parentElement!.parentElement!.parentElement!;
+    let quantityEl: HTMLInputElement = trEl.querySelector(quantityElSelector)!;
+    let foilEl: HTMLInputElement = trEl.querySelector(foilElSelector)!;
+    let priceEl: HTMLInputElement = trEl.querySelector(priceElSelector)!;
 
     // Check if there's already quantity on this row... if so, we may need to create a new one
     // This covers the foils + non foil rows
-    let quantityEl: HTMLInputElement = trEl.querySelector('td input[name^="amount"]')!;
     if (quantityEl.value && quantityEl.value !== '0') {
       const buttonEl: HTMLButtonElement = trEl.querySelector('td button.copy-row-button')!;
       buttonEl.click();
       trEl = trEl.previousSibling as HTMLElement;
-      quantityEl = trEl.querySelector('td input[name^="amount"]')!;
+      // We need to point the fields to those of the new parent trEl and reset them
+      quantityEl = trEl.querySelector(quantityElSelector)!;
+      quantityEl.value = quantityEl.defaultValue;
+      foilEl = trEl.querySelector(foilElSelector)!;
+      foilEl.checked = foilEl.defaultChecked;
+      priceEl = trEl.querySelector(priceElSelector)!;
+      priceEl.value = priceEl.defaultValue;
     }
 
     // Now match the data
 
     /* Quantity */
     const quantity = Number(row[columns['quantity']]) || 0;
-    if (quantity) {
-      quantityEl.value = quantity.toString();
-    }
+    if (quantity) quantityEl.value = quantity.toString();
 
     /* Is Foil */
     const isFoil = VALID_FOIL_VALUES.some((v) => compareNormalized(v, row[columns['foil']]));
-    if (isFoil) {
-      const foilEl: HTMLInputElement = trEl.querySelector('td input[name^="isFoil"]')!;
-      foilEl.click();
-    }
+    if (isFoil) foilEl.checked = true;
 
     /* Price */
     const price = Number(row[columns['price']]) || 0;
-    if (price) {
-      const priceEl: HTMLInputElement = trEl.querySelector('td input[name^="price"]')!;
-      priceEl.value = price.toFixed(2);
-    }
+    if (price) priceEl.value = price.toFixed(2);
 
     // Push to results
     results.push({ name, quantity, isFoil, price });
