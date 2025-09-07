@@ -33,19 +33,19 @@ function SuccessModal({ results }: SuccessModalProps) {
   return (
     <Modal show={show} onHide={() => setShow(false)} size="lg">
       <Modal.Header closeButton>
-        <Modal.Title>{ i18n.t('injected-button.success.title') }</Modal.Title>
+        <Modal.Title>{ i18n.t('injectedButton.success.title') }</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        { i18n.t('injected-button.success.body', results?.length ?? 0) }
+        { i18n.t('injectedButton.success.body', results?.length ?? 0) }
         <hr />
         <Table striped bordered size="sm">
           <thead>
             <tr>
-              <th className="col-md-1">{ i18n.t('injected-button.success.table.numberColumn') }</th>
-              <th className="col-md-8">{ i18n.t('injected-button.success.table.nameColumn') }</th>
-              <th className="col-md-1">{ i18n.t('injected-button.success.table.quantityColumn') }</th>
-              <th className="col-md-1">{ i18n.t('injected-button.success.table.foilColumn') }</th>
-              <th className="col-md-1">{ i18n.t('injected-button.success.table.priceColumn') }</th>
+              <th className="col-md-1">{ i18n.t('injectedButton.success.table.numberColumn') }</th>
+              <th className="col-md-8">{ i18n.t('injectedButton.success.table.nameColumn') }</th>
+              <th className="col-md-1">{ i18n.t('injectedButton.success.table.quantityColumn') }</th>
+              <th className="col-md-1">{ i18n.t('injectedButton.success.table.foilColumn') }</th>
+              <th className="col-md-1">{ i18n.t('injectedButton.success.table.priceColumn') }</th>
             </tr>
           </thead>
           <tbody>
@@ -95,7 +95,7 @@ function SuccessModal({ results }: SuccessModalProps) {
         }
       </Modal.Body>
       <Modal.Footer>
-        <Button onClick={() => setShow(false)}>{ i18n.t('injected-button.success.close') }</Button>
+        <Button onClick={() => setShow(false)}>{ i18n.t('injectedButton.success.close') }</Button>
       </Modal.Footer>
     </Modal>
   );

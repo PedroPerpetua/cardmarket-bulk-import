@@ -40,7 +40,7 @@
             "disclaimer_b": "Use at own risk."
         }
     },
-    "injected-button": {
+    "injectedButton": {
         "button": "Import CSV...",
         "modal": {
             "title": "Import listings from CSV",

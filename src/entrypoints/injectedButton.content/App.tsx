@@ -33,11 +33,11 @@ function App() {
     <>
       <Button className="w-100 mt-1" onClick={() => setShow(true)}>
         <Image src={Icon} height={18} />
-        <span>{ i18n.t('injected-button.button') }</span>
+        <span>{ i18n.t('injectedButton.button') }</span>
       </Button>
       <Modal size="sm" show={show} onHide={() => setShow(false)}>
         <Modal.Header closeButton>
-          <Modal.Title>{ i18n.t('injected-button.modal.title') }</Modal.Title>
+          <Modal.Title>{ i18n.t('injectedButton.modal.title') }</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <ImportCSVForm onSubmit={onSubmit} />

@@ -19,9 +19,9 @@ export type ImportCSVFormValues = {
 };
 
 const validationSchema: yup.ObjectSchema<ImportCSVFormValues> = yup.object({
-  files: yup.mixed<FileList>().required(i18n.t('injected-button.modal.form.files.required')),
-  batch: yup.number().required(i18n.t('injected-button.modal.form.batch.required')),
-  nameColumn: yup.string().required(i18n.t('injected-button.modal.form.nameColumn.required')),
+  files: yup.mixed<FileList>().required(i18n.t('injectedButton.modal.form.files.required')),
+  batch: yup.number().required(i18n.t('injectedButton.modal.form.batch.required')),
+  nameColumn: yup.string().required(i18n.t('injectedButton.modal.form.nameColumn.required')),
   quantityColumn: yup.string(),
   foilColumn: yup.string(),
   priceColumn: yup.string(),
@@ -62,7 +62,7 @@ function ImportCSVForm({ onSubmit }: ImportCSVFormProps) {
         <Row>
           <Col sm={needsBatches ? 9 : 12}>
             <Form.Group controlId="importCSVForm.Files">
-              <Form.Label>{ i18n.t('injected-button.modal.form.files.label') }</Form.Label>
+              <Form.Label>{ i18n.t('injectedButton.modal.form.files.label') }</Form.Label>
               <Form.Control
                 type="file"
                 accept=".csv"
@@ -78,11 +78,11 @@ function ImportCSVForm({ onSubmit }: ImportCSVFormProps) {
                     direction="horizontal"
                     className="justify-content-between align-items-baseline"
                   >
-                    <Form.Label>{ i18n.t('injected-button.modal.form.batch.label') }</Form.Label>
+                    <Form.Label>{ i18n.t('injectedButton.modal.form.batch.label') }</Form.Label>
                     <OverlayTrigger
                       overlay={(
                         <Tooltip id="importCSVForm.Batch-tooltip">
-                          { i18n.t('injected-button.modal.form.batch.tooltip') }
+                          { i18n.t('injectedButton.modal.form.batch.tooltip') }
                         </Tooltip>
                       )}
                       placement="right"
@@ -109,32 +109,32 @@ function ImportCSVForm({ onSubmit }: ImportCSVFormProps) {
                 control={control}
                 formId="importCSVForm.nameColumn"
                 name="nameColumn"
-                label={i18n.t('injected-button.modal.form.nameColumn.label')}
+                label={i18n.t('injectedButton.modal.form.nameColumn.label')}
                 options={options}
               />
               <ColumnSelect<ImportCSVFormValues>
                 control={control}
                 formId="importCSVForm.quantityColumn"
                 name="quantityColumn"
-                label={i18n.t('injected-button.modal.form.quantityColumn.label')}
+                label={i18n.t('injectedButton.modal.form.quantityColumn.label')}
                 options={options}
               />
               <ColumnSelect<ImportCSVFormValues>
                 control={control}
                 formId="importCSVForm.foilColumn"
                 name="foilColumn"
-                label={i18n.t('injected-button.modal.form.foilColumn.label')}
+                label={i18n.t('injectedButton.modal.form.foilColumn.label')}
                 options={options}
               />
               <ColumnSelect<ImportCSVFormValues>
                 control={control}
                 formId="importCSVForm.priceColumn"
                 name="priceColumn"
-                label={i18n.t('injected-button.modal.form.priceColumn.label')}
+                label={i18n.t('injectedButton.modal.form.priceColumn.label')}
                 options={options}
               />
               <Button type="submit" className="mx-auto">
-                { i18n.t('injected-button.modal.form.submit') }
+                { i18n.t('injectedButton.modal.form.submit') }
               </Button>
             </>
           )
