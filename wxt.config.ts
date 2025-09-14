@@ -12,6 +12,9 @@ export default defineConfig({
     name: 'Cardmarket Bulk Import',
     default_locale: 'en',
   },
+  zip: {
+    sourcesRoot: 'src',
+  },
   srcDir: 'src',
   imports: false,
   vite: () => ({
