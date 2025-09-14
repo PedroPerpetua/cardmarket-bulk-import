@@ -7,7 +7,7 @@ import type { ImportCSVFormValues } from './components/ImportCSVForm';
 import SuccessModal from './components/SuccessModal';
 import { fillPage } from './components/utils';
 import type { Result } from './components/utils';
-import Icon from '../../assets/icon.png';
+import IconTransparent from '../../assets/icon-transparent.png';
 
 function App() {
   const [show, setShow] = useState(false);
@@ -32,7 +32,7 @@ function App() {
   return (
     <>
       <Button className="w-100 mt-1" onClick={() => setShow(true)}>
-        <Image src={Icon} height={18} />
+        <Image src={IconTransparent} height={18} />
         <span>{ i18n.t('injectedButton.button') }</span>
       </Button>
       <Modal size="sm" show={show} onHide={() => setShow(false)}>
