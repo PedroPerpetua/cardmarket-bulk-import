@@ -1,6 +1,7 @@
 import { parse } from 'csv-parse';
 
-export function normalizeString(str: string) {
+export function normalizeString(str?: string) {
+  if (!str) return '';
   return str.normalize('NFD').replace(/\p{Diacritic}/gu, '').toLowerCase();
 }
 
