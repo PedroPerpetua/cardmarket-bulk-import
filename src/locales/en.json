@@ -44,15 +44,10 @@
         "button": "Import CSV...",
         "modal": {
             "title": "Import listings from CSV",
-            "form": {
+            "importCsvForm": {
                 "files": {
                     "label": "CSV File",
                     "required": "You must upload a file."
-                },
-                "batch": {
-                    "label": "Batch",
-                    "tooltip": "Cardmarket can not process more than 100 entries per bulk list; your file has more than 100 entries, so it will be split into batches.",
-                    "required": "You must select a batch"
                 },
                 "nameColumn": {
                     "label": "Name Column",
@@ -67,23 +62,28 @@
                 "priceColumn": {
                     "label": "Price Column"
                 },
+                "submit": "Select rows"
+            },
+            "selectRowsForm": {
+                "table": {
+                    "checkColumn": "Fill",
+                    "nameColumn": "Name",
+                    "quantityColumn": "Quantity",
+                    "foilColumn": "Foil",
+                    "priceColumn": "Price"
+                },
+                "min": "You must select at least 1 row!",
+                "max": "You can select at most 100 rows!",
+                "count_a": " selected of ",
+                "count_b": " (",
+                "count_c": " total)",
+                "showDisabled": "Show disabled",
                 "submit": "Fill page!"
+            },
+            "successToast": {
+                "title": "Filled successfully",
+                "body_a": " rows filled."
             }
-        },
-        "success": {
-            "title": "Listings imported successfully!",
-            "body": {
-                "1": "1 row was imported!",
-                "n": "$1 rows were imported!"
-            },
-            "table": {
-                "numberColumn": "#",
-                "nameColumn": "Name",
-                "quantityColumn": "Quantity",
-                "foilColumn": "Foil",
-                "priceColumn": "Price"
-            },
-            "close": "Close"
         }
     }
 }

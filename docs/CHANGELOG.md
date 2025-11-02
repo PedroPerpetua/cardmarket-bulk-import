@@ -1,5 +1,12 @@
 # Changelog
 
+
+## [UNRELEASED]
+
+### Changes
+- Modified form flow to work around batches and use row selection instead.
+
+
 ## [1.0.1] - 2025-09-29
 
 ### Bugfixes

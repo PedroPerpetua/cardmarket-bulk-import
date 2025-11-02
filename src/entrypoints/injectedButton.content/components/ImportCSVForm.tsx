@@ -1,147 +1,125 @@
 import { i18n } from '#imports';
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 
 import { yupResolver } from '@hookform/resolvers/yup';
-import { Button, Col, Form, OverlayTrigger, Row, Stack, Tooltip } from 'react-bootstrap';
+import { Button, Form, Spinner, Stack } from 'react-bootstrap';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
 
 import ColumnSelect from './ColumnSelect';
-import { paginateArray, readCSV, BATCH_SIZE } from './utils';
+import { getCsvColumns } from '../utils/csv';
+import { parseCsv } from '../utils/parse';
+import type { ParsedRow } from '../utils/parse';
+import useAsyncFn from '../utils/useAsyncFn';
 
-export type ImportCSVFormValues = {
+export type ImportCsvFormValues = {
   files: FileList,
-  batch: number,
   nameColumn: string,
   quantityColumn?: string,
   foilColumn?: string,
   priceColumn?: string,
 };
 
-const validationSchema: yup.ObjectSchema<ImportCSVFormValues> = yup.object({
-  files: yup.mixed<FileList>().required(i18n.t('injectedButton.modal.form.files.required')),
-  batch: yup.number().required(i18n.t('injectedButton.modal.form.batch.required')),
-  nameColumn: yup.string().required(i18n.t('injectedButton.modal.form.nameColumn.required')),
+const validationSchema: yup.ObjectSchema<ImportCsvFormValues> = yup.object({
+  files: yup.mixed<FileList>()
+    .required(i18n.t('injectedButton.modal.importCsvForm.files.required')),
+  nameColumn: yup.string()
+    .required(i18n.t('injectedButton.modal.importCsvForm.nameColumn.required')),
   quantityColumn: yup.string(),
   foilColumn: yup.string(),
   priceColumn: yup.string(),
 });
 
-type ImportCSVFormProps = {
-  onSubmit: (data: ImportCSVFormValues) => void,
+type ImportCsvFormProps = {
+  onSubmit: (data: ParsedRow[]) => void,
 };
 
-function ImportCSVForm({ onSubmit }: ImportCSVFormProps) {
-  const { control, register, handleSubmit, watch, resetField } = useForm<ImportCSVFormValues>({
+function ImportCsvForm({ onSubmit }: ImportCsvFormProps) {
+  const [{ value: columns, loading, error }, getColumns] = useAsyncFn(getCsvColumns);
+  const { control, register, handleSubmit, watch, setError } = useForm<ImportCsvFormValues>({
     resolver: yupResolver(validationSchema),
-    defaultValues: { batch: 1 },
   });
 
-  const files = watch('files');
+  const submitFn = async (data: ImportCsvFormValues) => {
+    try {
+      const res = await parseCsv(data.files[0], {
+        name: data.nameColumn,
+        quantity: data.quantityColumn,
+        isFoil: data.foilColumn,
+        price: data.priceColumn,
+      });
+      onSubmit(res);
+    }
+    catch (e) {
+      if (!(e instanceof Error)) setError('root', { message: 'Unknown error.' });
+      else setError('root', e);
+    }
+  };
 
-  const [records, setRecords] = useState<unknown[]>([]);
+  const files = watch('files');
   useEffect(() => {
     const f = files?.item(0);
-    if (!f) {
-      setRecords([]);
-      resetField('batch');
-    }
-    else {
-      readCSV(f).then((res) => setRecords(res));
-    }
-  }, [files, resetField]);
+    if (f) getColumns(f);
+  }, [files, getColumns]);
 
-  const { indexArr } = paginateArray(records, BATCH_SIZE);
-  const needsBatches = indexArr.length > 1;
+  useEffect(() => {
+    if (error) console.error('[cardmarket-bulk-import] Failed to parse Csv file.', error);
+  }, [error]);
 
-  const options = Object.keys(records.at(0) ?? {});
+  let columnsEl = null;
+  if (loading) columnsEl = (<Spinner />);
+  else if (error) columnsEl = (<h5>Invalid file</h5>);
+  else if (columns) columnsEl = (
+    <>
+      <ColumnSelect<ImportCsvFormValues>
+        control={control}
+        formId="importCsvForm.nameColumn"
+        name="nameColumn"
+        label={i18n.t('injectedButton.modal.importCsvForm.nameColumn.label')}
+        options={columns}
+      />
+      <ColumnSelect<ImportCsvFormValues>
+        control={control}
+        formId="importCsvForm.quantityColumn"
+        name="quantityColumn"
+        label={i18n.t('injectedButton.modal.importCsvForm.quantityColumn.label')}
+        options={columns}
+      />
+      <ColumnSelect<ImportCsvFormValues>
+        control={control}
+        formId="importCsvForm.foilColumn"
+        name="foilColumn"
+        label={i18n.t('injectedButton.modal.importCsvForm.foilColumn.label')}
+        options={columns}
+      />
+      <ColumnSelect<ImportCsvFormValues>
+        control={control}
+        formId="importCsvForm.priceColumn"
+        name="priceColumn"
+        label={i18n.t('injectedButton.modal.importCsvForm.priceColumn.label')}
+        options={columns}
+      />
+      <Button type="submit" className="mx-auto">
+        { i18n.t('injectedButton.modal.importCsvForm.submit') }
+      </Button>
+    </>
+  );
 
   return (
-    <Form onSubmit={handleSubmit(onSubmit)}>
+    <Form noValidate onSubmit={handleSubmit(submitFn)}>
       <Stack gap={2}>
-        <Row>
-          <Col sm={needsBatches ? 9 : 12}>
-            <Form.Group controlId="importCSVForm.Files">
-              <Form.Label>{ i18n.t('injectedButton.modal.form.files.label') }</Form.Label>
-              <Form.Control
-                type="file"
-                accept=".csv"
-                {...register('files')}
-              />
-            </Form.Group>
-          </Col>
-          {
-            needsBatches && (
-              <Col sm={3}>
-                <Form.Group controlId="importCSVForm.Batch">
-                  <Stack
-                    direction="horizontal"
-                    className="justify-content-between align-items-baseline"
-                  >
-                    <Form.Label>{ i18n.t('injectedButton.modal.form.batch.label') }</Form.Label>
-                    <OverlayTrigger
-                      overlay={(
-                        <Tooltip id="importCSVForm.Batch-tooltip">
-                          { i18n.t('injectedButton.modal.form.batch.tooltip') }
-                        </Tooltip>
-                      )}
-                      placement="right"
-                    >
-                      <span className="fonticon-info" />
-                    </OverlayTrigger>
-                  </Stack>
-                  <Form.Select {...register('batch')}>
-                    {
-                      indexArr.map((v) => (
-                        <option key={v} value={v}>{ v }</option>
-                      ))
-                    }
-                  </Form.Select>
-                </Form.Group>
-              </Col>
-            )
-          }
-        </Row>
-        {
-          files?.item(0) && (
-            <>
-              <ColumnSelect<ImportCSVFormValues>
-                control={control}
-                formId="importCSVForm.nameColumn"
-                name="nameColumn"
-                label={i18n.t('injectedButton.modal.form.nameColumn.label')}
-                options={options}
-              />
-              <ColumnSelect<ImportCSVFormValues>
-                control={control}
-                formId="importCSVForm.quantityColumn"
-                name="quantityColumn"
-                label={i18n.t('injectedButton.modal.form.quantityColumn.label')}
-                options={options}
-              />
-              <ColumnSelect<ImportCSVFormValues>
-                control={control}
-                formId="importCSVForm.foilColumn"
-                name="foilColumn"
-                label={i18n.t('injectedButton.modal.form.foilColumn.label')}
-                options={options}
-              />
-              <ColumnSelect<ImportCSVFormValues>
-                control={control}
-                formId="importCSVForm.priceColumn"
-                name="priceColumn"
-                label={i18n.t('injectedButton.modal.form.priceColumn.label')}
-                options={options}
-              />
-              <Button type="submit" className="mx-auto">
-                { i18n.t('injectedButton.modal.form.submit') }
-              </Button>
-            </>
-          )
-        }
+        <Form.Group controlId="importCsvForm.Files">
+          <Form.Label>{ i18n.t('injectedButton.modal.importCsvForm.files.label') }</Form.Label>
+          <Form.Control
+            type="file"
+            accept=".csv"
+            {...register('files')}
+          />
+        </Form.Group>
+        { columnsEl }
       </Stack>
     </Form>
   );
 }
 
-export default ImportCSVForm;
+export default ImportCsvForm;
