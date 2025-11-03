@@ -10,11 +10,8 @@
                 "step_1_c": "'s a quick link!",
                 "step_2": "Press the \"Import CSV...\" button injected by this extension. It should be right below the \"Bulk Modification\" menu.",
                 "step_3": "Select your file and match the columns in the CSV to the columns in Cardmarket.",
-                "step_4": "Press \"Fill page!\". The extension will automatically fill in the table with the cards it can match!",
-                "note_a": "NOTE",
-                "note_b": ": Cardmarket only allows 100 listings per upload, so your file might need to be split into ",
-                "note_c": "batches",
-                "note_d": " of 100 rows. You should submit one batch at a time (which means you may need to repeat this process multiple times for large files)."
+                "step_4": "Press \"SELECT ROWS\" and select which rows to fill from the CSV (up to 100).",
+                "step_5": "Press \"FILL PAGE!\". The extension will automatically fill in the table with the selected rows!"
             },
             "reportIssue": {
                 "button": "Report an issue",
