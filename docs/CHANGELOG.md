@@ -5,6 +5,7 @@
 
 ### Changes
 - Modified form flow to work around batches and use row selection instead.
+- Foil values now show an icon instead of "yes" / "no".
 
 ### Housekeeping
 - Upgraded engines:

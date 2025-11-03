@@ -122,7 +122,15 @@ function SelectRowsForm({ rows, onSubmit }: SelectRowsFormProps) {
                   </td>
                   <td>{ r.name }</td>
                   <td>{ r.quantity }</td>
-                  <td>{ r.isFoil ? 'Yes' : 'No' }</td>
+                  <td>
+                    <span
+                      className={
+                        r.isFoil
+                          ? 'fonticon-check-circle text-success'
+                          : 'fonticon-cross-circle text-danger'
+                      }
+                    />
+                  </td>
                   <td>{ `${r.price.toFixed(2)}€` }</td>
                 </tr>
               ))
