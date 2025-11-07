@@ -45,7 +45,7 @@ function SelectRowsForm({ rows, onSubmit }: SelectRowsFormProps) {
   const { control, watch, handleSubmit, formState } = useForm<SelectedRowsFormValues>({
     resolver: yupResolver(validationSchema),
     // Select the first 100
-    defaultValues: { selectedRows: enabledRows.map((r) => r.id) },
+    defaultValues: { selectedRows: enabledRows.map((r) => r.id).slice(0, 100) },
   });
   const submitFn = (data: SelectedRowsFormValues) => {
     onSubmit(rows.filter((r) => data.selectedRows.includes(r.id)));
