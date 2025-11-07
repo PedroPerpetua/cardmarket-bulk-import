@@ -48,9 +48,12 @@
     "typescript-eslint": "8.46.3",
     "wxt": "0.20.11"
   },
+  "resolutions": {
+    "rollup": "4.52.5"
+  },
   "engines": {
     "node": "24.11.0",
-    "yarn": "4.10.3"
+    "yarn": "4.11.0"
   },
-  "packageManager": "yarn@4.10.3"
+  "packageManager": "yarn@4.11.0"
 }

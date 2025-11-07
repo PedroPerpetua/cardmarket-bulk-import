@@ -10,6 +10,7 @@
 ### Housekeeping
 - Upgraded engines:
   - `node`: `22.20.0` -> `24.11.0`.
+  - `yarn`: `4.10.3` -> `4.11.0`.
 - Upgraded dependencies:
   - `react`: `19.1.1` -> `19.2.0`.
   - `react-dom`: `19.1.1` -> `19.2.0`.
