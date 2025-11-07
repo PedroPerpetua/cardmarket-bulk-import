@@ -5,7 +5,7 @@ import { createPortal } from 'react-dom';
 
 import ImportCSVForm from './components/ImportCsvForm';
 import SelectRowsForm from './components/SelectRowsForm';
-import SuccessToast from './components/SuccessToast';
+import SuccessAlert from './components/SuccessAlert';
 import { fillPage } from './utils/parse';
 import type { ParsedRow } from './utils/parse';
 import IconTransparent from '../../assets/icon-transparent.png';
@@ -49,7 +49,7 @@ function App() {
       </Modal>
       {
         createPortal(
-          <SuccessToast count={filledCount} onDismiss={() => setFilledCount(null)} />,
+          <SuccessAlert count={filledCount} onDismiss={() => setFilledCount(null)} />,
           document.body.querySelector('header')!,
         )
       }

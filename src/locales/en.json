@@ -77,10 +77,7 @@
                 "showDisabled": "Show disabled",
                 "submit": "Fill page!"
             },
-            "successToast": {
-                "title": "Filled successfully",
-                "body_a": " rows filled."
-            }
+            "successAlert_a": " row(s) filled successfully."
         }
     }
 }
