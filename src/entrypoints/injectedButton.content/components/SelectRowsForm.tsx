@@ -6,7 +6,7 @@ import { Button, Form, Pagination, Stack, Table } from 'react-bootstrap';
 import { Controller, useForm } from 'react-hook-form';
 import * as yup from 'yup';
 
-import { setInArray } from '../utils';
+import { setInArray, splitIntoBatches } from '../utils';
 import type { ParsedRow } from '../utils/parse';
 import usePaginatedArray from '../utils/usePaginatedArray';
 
@@ -42,10 +42,10 @@ function SelectRowsForm({ rows, onSubmit }: SelectRowsFormProps) {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [showDisabled]);
 
-  const { control, watch, handleSubmit, formState } = useForm<SelectedRowsFormValues>({
+  const { control, watch, handleSubmit, formState, setValue } = useForm<SelectedRowsFormValues>({
     resolver: yupResolver(validationSchema),
     // Select the first 100
-    defaultValues: { selectedRows: enabledRows.map((r) => r.id).slice(0, 100) },
+    defaultValues: { selectedRows: enabledRows.slice(0, 100).map((r) => r.id) },
   });
   const submitFn = (data: SelectedRowsFormValues) => {
     onSubmit(rows.filter((r) => data.selectedRows.includes(r.id)));
@@ -60,16 +60,32 @@ function SelectRowsForm({ rows, onSubmit }: SelectRowsFormProps) {
           direction="horizontal"
           className="align-items-center justify-content-between flex-grow mb-1"
         >
-          <h5>
+          <Stack direction="horizontal" gap={2}>
+            <h5>
+              {
+                selectedCount.toString()
+                + i18n.t('injectedButton.modal.selectRowsForm.count_a')
+                + enabledRows.length.toString()
+                + i18n.t('injectedButton.modal.selectRowsForm.count_b')
+                + rows.length.toString()
+                + i18n.t('injectedButton.modal.selectRowsForm.count_c')
+              }
+            </h5>
             {
-              selectedCount.toString()
-              + i18n.t('injectedButton.modal.selectRowsForm.count_a')
-              + enabledRows.length.toString()
-              + i18n.t('injectedButton.modal.selectRowsForm.count_b')
-              + rows.length.toString()
-              + i18n.t('injectedButton.modal.selectRowsForm.count_c')
+              splitIntoBatches(enabledRows.length).map(([start, end]) => (
+                <Button
+                  key={`${start}-${end}`}
+                  onClick={() => setValue(
+                    'selectedRows',
+                    enabledRows.slice(start - 1, end).map((r) => r.id),
+                  )}
+                  size="sm"
+                >
+                  { `${start}...${end}` }
+                </Button>
+              ))
             }
-          </h5>
+          </Stack>
           <Form.Switch
             value={showDisabled ? 'checked' : 'unchecked'}
             onChange={(e) => setShowDisabled(e.target.checked)}
@@ -166,7 +182,7 @@ function SelectRowsForm({ rows, onSubmit }: SelectRowsFormProps) {
           {
             indexArr.length > 1
               ? (
-                  <Pagination>
+                  <Pagination className="m-0">
                     {
                       indexArr.map((pNumber) => (
                         <Pagination.Item
