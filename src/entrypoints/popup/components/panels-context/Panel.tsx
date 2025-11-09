@@ -19,12 +19,15 @@ function Panel({ children, title }: PanelProps) {
       <Stack
         direction="horizontal"
         className="position-fixed top-0 align-items-center vw-100 p-2"
-        style={{ backgroundColor: 'var(--background)', marginLeft: 'calc(var(--body-padding) * -1)' }}
+        style={{
+          backgroundColor: 'var(--background)',
+          marginLeft: 'calc(var(--body-padding) * -1)',
+        }}
         ref={(node) => setHeightMargin(node?.clientHeight ?? 0)}
       >
         {
           canGoBack && (
-            <Button onClick={goBack} style={{ width: 'fit-content', padding: 0 }}>
+            <Button onClick={goBack} className="p-0" style={{ width: 'fit-content' }}>
               <Image src={BackIcon} width={32} />
             </Button>
           )
