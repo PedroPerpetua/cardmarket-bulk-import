@@ -3,7 +3,7 @@ import { useState, i18n } from '#imports';
 import { Button, Modal, Image } from 'react-bootstrap';
 import { createPortal } from 'react-dom';
 
-import ImportCSVForm from './components/ImportCsvForm';
+import ImportCsvForm from './components/ImportCsvForm';
 import SelectRowsForm from './components/SelectRowsForm';
 import SuccessAlert from './components/SuccessAlert';
 import { fillPage } from './utils/parse';
@@ -15,7 +15,7 @@ function App() {
   const [importedRows, setImportedRows] = useState<ParsedRow[] | null>(null);
   const [filledCount, setFilledCount] = useState<number | null>(null);
 
-  let content = (<ImportCSVForm onSubmit={(res) => setImportedRows(res)} />);
+  let content = (<ImportCsvForm onSubmit={(res) => setImportedRows(res)} />);
   if (importedRows !== null) content = (
     <SelectRowsForm
       rows={importedRows}
