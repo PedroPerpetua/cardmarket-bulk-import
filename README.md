@@ -30,7 +30,3 @@ The entire code is open source and you can verify it here; you can even clone th
 I have improvements planned when I find the time to work on them! Check the [TODO](docs/TODO.md) file for the planned upgrades.
 
 I will accept contributions to this project. Open a pull request to the develop branch and I'll review it as soon as I can!
-
-
-## Development notes
-- `rollup` is currently pinned to version `4.52.5` as a peer dependency; see this [issue](https://github.com/rollup/rollup/issues/6168). Once the issue has been fixed we can default to the latest version.
