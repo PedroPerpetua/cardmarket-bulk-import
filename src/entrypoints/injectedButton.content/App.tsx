@@ -6,8 +6,8 @@ import { createPortal } from 'react-dom';
 import ImportCsvForm from './components/ImportCsvForm';
 import SelectRowsForm from './components/SelectRowsForm';
 import SuccessAlert from './components/SuccessAlert';
-import { fillPage } from './utils/parse';
-import type { ParsedRow } from './utils/parse';
+import { fillPage } from './parse';
+import type { ParsedRow } from './parse';
 import IconTransparent from '../../assets/icon-transparent.png';
 
 function App() {

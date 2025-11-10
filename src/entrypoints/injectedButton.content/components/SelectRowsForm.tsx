@@ -6,9 +6,9 @@ import { Button, Form, Pagination, Stack, Table } from 'react-bootstrap';
 import { Controller, useForm } from 'react-hook-form';
 import * as yup from 'yup';
 
-import { setInArray, splitIntoBatches } from '../utils';
-import type { ParsedRow } from '../utils/parse';
-import usePaginatedArray from '../utils/usePaginatedArray';
+import { splitIntoBatches, setInArray } from '../../../utils';
+import usePaginatedArray from '../../../utils/usePaginatedArray';
+import type { ParsedRow } from '../parse';
 
 type SelectedRowsFormValues = {
   selectedRows: number[],
@@ -100,8 +100,11 @@ function SelectRowsForm({ rows, onSubmit }: SelectRowsFormProps) {
               <th className="col-md-1">
                 { i18n.t('injectedButton.modal.selectRowsForm.table.checkColumn') }
               </th>
-              <th className="col-md-8">
+              <th className="col-md-7">
                 { i18n.t('injectedButton.modal.selectRowsForm.table.nameColumn') }
+              </th>
+              <th className="col-md-1">
+                { i18n.t('injectedButton.modal.selectRowsForm.table.setColumn') }
               </th>
               <th className="col-md-1">
                 { i18n.t('injectedButton.modal.selectRowsForm.table.quantityColumn') }
@@ -137,6 +140,7 @@ function SelectRowsForm({ rows, onSubmit }: SelectRowsFormProps) {
                     />
                   </td>
                   <td>{ r.name }</td>
+                  <td>{ r.set }</td>
                   <td>{ r.quantity }</td>
                   <td>
                     <span

@@ -1,11 +1,31 @@
-import { compareNormalized } from '.';
-import { readCsv } from './csv';
+import memoize from 'memoize';
+import { sendMessage } from 'webext-bridge/content-script';
+
+import { compareNormalized } from '../../utils';
+import { readCsv } from '../../utils/csv';
+
+async function getMTGJSONDataImpl() {
+  // We can't fetch inside the content script, so we delegate to the background with messages
+  return sendMessage('cardmarket-bulk-import.getMTGJSONData', undefined, 'background');
+}
+
+export const getMTGJSONData = memoize(getMTGJSONDataImpl);
+
+async function matchSetToCardmarketIdImpl(set: string) {
+  const sets = await getMTGJSONData();
+  const result = sets.find(({ matchKeys }) => !!matchKeys.find((v) => compareNormalized(v, set)));
+  if (result) return { code: result.code, cardmarketId: result.cardmarketId };
+  return null;
+}
+
+export const matchSetToCardmarketId = memoize(matchSetToCardmarketIdImpl);
 
 const VALID_FOIL_VALUES = ['t', '1', 'foil', 'yes'];
 
 export type ParsedRow = {
   id: number, // Internal id to manage in form
   name: string,
+  set: string,
   quantity: number,
   isFoil: boolean,
   price: number,
@@ -16,22 +36,40 @@ export async function parseCsv(
   file: File,
   columnMapping: Record<Exclude<keyof ParsedRow, 'id' | 'enabled'>, string | undefined>,
 ) {
+  const paramsCode = Number(new URLSearchParams(window.location.search).get('idExpansion'));
+
   const data = await readCsv(file);
   const rows: ParsedRow[] = [];
 
-  data.rows.forEach((row, i) => {
+  for (const [i, row] of data.rows.entries()) {
     const parsedName = String(row[columnMapping['name']!]);
+
+    let enabled = !!getWebsiteRows().find((el) => compareNormalized(el.textContent, parsedName));
+    let set = columnMapping['set'] ? String(row[columnMapping['set']]) : '';
+    if (set) {
+      const data = await matchSetToCardmarketId(set);
+      if (data) {
+        set = data.code;
+        if (data.cardmarketId !== paramsCode) enabled = false;
+      }
+      else {
+        set = '';
+      }
+    }
+
     rows.push({
       id: i,
       name: parsedName,
+      set: set,
       quantity: columnMapping['quantity'] ? (Number(row[columnMapping['quantity']]) || 0) : 0,
       isFoil: columnMapping['isFoil']
         ? VALID_FOIL_VALUES.includes(String(row[columnMapping['isFoil']]).toLowerCase())
         : false,
       price: columnMapping['price'] ? (Number(row[columnMapping['price']]) || 0) : 0,
-      enabled: !!getWebsiteRows().find((el) => compareNormalized(el.textContent, parsedName)),
+      enabled,
     });
-  });
+  }
+
   return rows;
 }
 

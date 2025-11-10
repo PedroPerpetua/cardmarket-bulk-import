@@ -4,6 +4,7 @@
 ## [UNRELEASED]
 
 ### Changes
+- Sets now supported! You can select a column for "SET" and the extension will only match cards from your CSV that are part of the set you have open (as given by the `idExpansion` in the page).
 - Modified form flow to work around batches and use row selection instead.
 - Foil values now show an icon instead of "yes" / "no".
 

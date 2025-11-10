@@ -50,6 +50,9 @@
                     "label": "Name Column",
                     "required": "You must select a column"
                 },
+                "setColumn": {
+                    "label": "Set Column"
+                },
                 "quantityColumn": {
                     "label": "Quantity Column"
                 },
@@ -65,6 +68,7 @@
                 "table": {
                     "checkColumn": "Fill",
                     "nameColumn": "Name",
+                    "setColumn": "Set",
                     "quantityColumn": "Quantity",
                     "foilColumn": "Foil",
                     "priceColumn": "Price"

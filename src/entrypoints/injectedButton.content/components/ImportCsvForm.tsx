@@ -7,14 +7,15 @@ import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
 
 import ColumnSelect from './ColumnSelect';
-import { getCsvColumns } from '../utils/csv';
-import { parseCsv } from '../utils/parse';
-import type { ParsedRow } from '../utils/parse';
-import useAsyncFn from '../utils/useAsyncFn';
+import { getCsvColumns } from '../../../utils/csv';
+import useAsyncFn from '../../../utils/useAsyncFn';
+import { parseCsv } from '../parse';
+import type { ParsedRow } from '../parse';
 
 export type ImportCsvFormValues = {
   files: FileList,
   nameColumn: string,
+  setColumn?: string,
   quantityColumn?: string,
   foilColumn?: string,
   priceColumn?: string,
@@ -25,6 +26,7 @@ const validationSchema: yup.ObjectSchema<ImportCsvFormValues> = yup.object({
     .required(i18n.t('injectedButton.modal.importCsvForm.files.required')),
   nameColumn: yup.string()
     .required(i18n.t('injectedButton.modal.importCsvForm.nameColumn.required')),
+  setColumn: yup.string(),
   quantityColumn: yup.string(),
   foilColumn: yup.string(),
   priceColumn: yup.string(),
@@ -44,6 +46,7 @@ function ImportCsvForm({ onSubmit }: ImportCsvFormProps) {
     try {
       const res = await parseCsv(data.files[0], {
         name: data.nameColumn,
+        set: data.setColumn,
         quantity: data.quantityColumn,
         isFoil: data.foilColumn,
         price: data.priceColumn,
@@ -76,6 +79,13 @@ function ImportCsvForm({ onSubmit }: ImportCsvFormProps) {
         formId="importCsvForm.nameColumn"
         name="nameColumn"
         label={i18n.t('injectedButton.modal.importCsvForm.nameColumn.label')}
+        options={columns}
+      />
+      <ColumnSelect<ImportCsvFormValues>
+        control={control}
+        formId="importCsvForm.setColumn"
+        name="setColumn"
+        label={i18n.t('injectedButton.modal.importCsvForm.setColumn.label')}
         options={columns}
       />
       <ColumnSelect<ImportCsvFormValues>
