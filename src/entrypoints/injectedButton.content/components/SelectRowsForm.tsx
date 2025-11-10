@@ -163,6 +163,7 @@ function SelectRowsForm({ rows, onSubmit }: SelectRowsFormProps) {
                   <td>&nbsp;</td>
                   <td>&nbsp;</td>
                   <td>&nbsp;</td>
+                  <td>&nbsp;</td>
                 </tr>
               ))
             }
