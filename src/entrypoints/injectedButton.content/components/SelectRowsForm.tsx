@@ -42,7 +42,13 @@ function SelectRowsForm({ rows, onSubmit }: SelectRowsFormProps) {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [showDisabled]);
 
-  const { control, watch, handleSubmit, formState, setValue } = useForm<SelectedRowsFormValues>({
+  const {
+    control,
+    watch,
+    handleSubmit,
+    formState: { errors: formErrors },
+    setValue,
+  } = useForm<SelectedRowsFormValues>({
     resolver: yupResolver(validationSchema),
     // Select the first 100
     defaultValues: { selectedRows: enabledRows.slice(0, 100).map((r) => r.id) },
@@ -170,12 +176,12 @@ function SelectRowsForm({ rows, onSubmit }: SelectRowsFormProps) {
           </tbody>
         </Table>
         {
-          formState.errors.selectedRows && (
+          formErrors.selectedRows && (
             <>
               { /* Bootstrap invalid-feedback requires an .is-invalid sibling */ }
               <div className="is-invalid d-none" />
               <div className="invalid-feedback mt-0 fs-6">
-                { formState.errors.selectedRows?.message }
+                { formErrors.selectedRows?.message }
               </div>
             </>
           )
