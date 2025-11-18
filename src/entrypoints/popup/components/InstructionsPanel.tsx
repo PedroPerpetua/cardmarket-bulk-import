@@ -6,6 +6,7 @@ import Panel from './panels-context/Panel';
 import Instructions1 from '../../../assets/instructions-1.png';
 import Instructions2 from '../../../assets/instructions-2.png';
 import Instructions3 from '../../../assets/instructions-3.png';
+import Instructions4 from '../../../assets/instructions-4.png';
 
 function InstructionsPanel() {
   return (
@@ -64,16 +65,23 @@ function InstructionsPanel() {
           </Col>
         </Row>
         <Row>
-          <p className="text-justify">
-            <span className="fw-bold">{ i18n.t('popup.panels.instructions.note_a') }</span>
-            { i18n.t('popup.panels.instructions.note_b') }
-            <span className="fw-bold">{ i18n.t('popup.panels.instructions.note_c') }</span>
-            { i18n.t('popup.panels.instructions.note_d') }
-          </p>
+          <Col xs={1} />
+          <Col className="d-flex justify-content-center">
+            <Image src={Instructions3} className="w-100" />
+          </Col>
         </Row>
         <Row>
+          <Col xs={1}>5.</Col>
+          <Col>
+            <p className="text-justify">
+              { i18n.t('popup.panels.instructions.step_5') }
+            </p>
+          </Col>
+        </Row>
+        <Row>
+          <Col xs={1} />
           <Col className="d-flex justify-content-center">
-            <Image src={Instructions3} />
+            <Image src={Instructions4} className="w-100" />
           </Col>
         </Row>
       </Container>

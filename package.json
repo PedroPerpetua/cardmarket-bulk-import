@@ -2,7 +2,7 @@
   "name": "cardmarket-bulk-import",
   "description": "Extension to allow CSV importing on Cardmarket's Bulk Listing",
   "private": true,
-  "version": "1.0.1",
+  "version": "1.1.0",
   "type": "module",
   "scripts": {
     "lint": "tsc -b; eslint --fix",
@@ -23,33 +23,36 @@
     "classnames": "2.5.1",
     "csv-parse": "6.1.0",
     "fuse.js": "7.1.0",
-    "react": "19.1.1",
+    "memoize": "10.2.0",
+    "react": "19.2.0",
     "react-bootstrap": "2.10.10",
-    "react-dom": "19.1.1",
-    "react-hook-form": "7.63.0",
+    "react-dom": "19.2.0",
+    "react-hook-form": "7.66.1",
     "vite-plugin-node-polyfills": "0.24.0",
+    "webext-bridge": "6.0.1",
     "yup": "1.7.1"
   },
   "devDependencies": {
-    "@stylistic/eslint-plugin": "5.4.0",
+    "@stylistic/eslint-plugin": "5.6.0",
     "@types/bootstrap": "5.2.10",
-    "@types/react": "19.1.15",
-    "@types/react-dom": "19.1.9",
+    "@types/react": "19.2.6",
+    "@types/react-dom": "19.2.3",
     "@wxt-dev/module-react": "1.1.5",
-    "eslint": "9.36.0",
+    "eslint": "9.39.1",
     "eslint-import-resolver-alias": "1.1.2",
     "eslint-import-resolver-typescript": "4.4.4",
     "eslint-plugin-import": "2.32.0",
     "eslint-plugin-react": "7.37.5",
-    "eslint-plugin-react-hooks": "5.2.0",
-    "eslint-plugin-react-refresh": "0.4.22",
-    "typescript": "5.9.2",
-    "typescript-eslint": "8.44.1",
+    "eslint-plugin-react-hooks": "7.0.1",
+    "eslint-plugin-react-refresh": "0.4.24",
+    "mtggraphql": "1.0.2",
+    "typescript": "5.9.3",
+    "typescript-eslint": "8.47.0",
     "wxt": "0.20.11"
   },
   "engines": {
-    "node": "22.20.0",
-    "yarn": "4.10.3"
+    "node": "24.11.1",
+    "yarn": "4.11.0"
   },
-  "packageManager": "yarn@4.10.3"
+  "packageManager": "yarn@4.11.0"
 }

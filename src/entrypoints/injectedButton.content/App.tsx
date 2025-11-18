@@ -1,49 +1,58 @@
 import { useState, i18n } from '#imports';
 
 import { Button, Modal, Image } from 'react-bootstrap';
+import { createPortal } from 'react-dom';
 
-import ImportCSVForm from './components/ImportCSVForm';
-import type { ImportCSVFormValues } from './components/ImportCSVForm';
-import SuccessModal from './components/SuccessModal';
-import { fillPage } from './components/utils';
-import type { Result } from './components/utils';
+import ImportCsvForm from './components/ImportCsvForm';
+import SelectRowsForm from './components/SelectRowsForm';
+import SuccessAlert from './components/SuccessAlert';
+import { fillPage } from './parse';
+import type { ParsedRow } from './parse';
 import IconTransparent from '../../assets/icon-transparent.png';
 
 function App() {
   const [show, setShow] = useState(false);
-  const [results, setResults] = useState<Result[] | null>(null);
+  const [importedRows, setImportedRows] = useState<ParsedRow[] | null>(null);
+  const [filledCount, setFilledCount] = useState<number | null>(null);
 
-  const onSubmit = (data: ImportCSVFormValues) => {
-    fillPage(
-      data.files.item(0)!,
-      {
-        name: data.nameColumn,
-        foil: data.foilColumn ?? '',
-        price: data.priceColumn ?? '',
-        quantity: data.quantityColumn ?? '',
-      },
-      data.batch,
-    ).then((res) => {
-      setResults(res);
-      setShow(false);
-    });
-  };
+  let content = (<ImportCsvForm onSubmit={(res) => setImportedRows(res)} />);
+  if (importedRows !== null) content = (
+    <SelectRowsForm
+      rows={importedRows}
+      onSubmit={(rows) => {
+        const filled = fillPage(rows);
+        setShow(false);
+        setFilledCount(filled);
+      }}
+    />
+  );
 
   return (
     <>
-      <Button className="w-100 mt-1" onClick={() => setShow(true)}>
+      <Button
+        className="w-100 mt-1"
+        onClick={() => {
+          setImportedRows(null);
+          setShow(true);
+        }}
+      >
         <Image src={IconTransparent} height={18} />
         <span>{ i18n.t('injectedButton.button') }</span>
       </Button>
-      <Modal size="sm" show={show} onHide={() => setShow(false)}>
+      <Modal size={importedRows !== null ? 'lg' : 'sm'} show={show} onHide={() => setShow(false)}>
         <Modal.Header closeButton>
           <Modal.Title>{ i18n.t('injectedButton.modal.title') }</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <ImportCSVForm onSubmit={onSubmit} />
+          { content }
         </Modal.Body>
       </Modal>
-      <SuccessModal results={results} />
+      {
+        createPortal(
+          <SuccessAlert count={filledCount} onDismiss={() => setFilledCount(null)} />,
+          document.body.querySelector('header')!,
+        )
+      }
     </>
   );
 }

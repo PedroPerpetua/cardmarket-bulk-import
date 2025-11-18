@@ -10,11 +10,8 @@
                 "step_1_c": "'s a quick link!",
                 "step_2": "Press the \"Import CSV...\" button injected by this extension. It should be right below the \"Bulk Modification\" menu.",
                 "step_3": "Select your file and match the columns in the CSV to the columns in Cardmarket.",
-                "step_4": "Press \"Fill page!\". The extension will automatically fill in the table with the cards it can match!",
-                "note_a": "NOTE",
-                "note_b": ": Cardmarket only allows 100 listings per upload, so your file might need to be split into ",
-                "note_c": "batches",
-                "note_d": " of 100 rows. You should submit one batch at a time (which means you may need to repeat this process multiple times for large files)."
+                "step_4": "Press \"SELECT ROWS\" and select which rows to fill from the CSV (up to 100).",
+                "step_5": "Press \"FILL PAGE!\". The extension will automatically fill in the table with the selected rows!"
             },
             "reportIssue": {
                 "button": "Report an issue",
@@ -44,19 +41,18 @@
         "button": "Import CSV...",
         "modal": {
             "title": "Import listings from CSV",
-            "form": {
+            "importCsvForm": {
                 "files": {
                     "label": "CSV File",
-                    "required": "You must upload a file."
-                },
-                "batch": {
-                    "label": "Batch",
-                    "tooltip": "Cardmarket can not process more than 100 entries per bulk list; your file has more than 100 entries, so it will be split into batches.",
-                    "required": "You must select a batch"
+                    "required": "You must upload a file.",
+                    "invalid": "Could not parse this file."
                 },
                 "nameColumn": {
                     "label": "Name Column",
                     "required": "You must select a column"
+                },
+                "setColumn": {
+                    "label": "Set Column"
                 },
                 "quantityColumn": {
                     "label": "Quantity Column"
@@ -67,23 +63,27 @@
                 "priceColumn": {
                     "label": "Price Column"
                 },
+                "submit": "Select rows",
+                "error": "An unknown error occurred parsing this file. Please make sure the CSV is correctly formatted."
+            },
+            "selectRowsForm": {
+                "table": {
+                    "checkColumn": "Fill",
+                    "nameColumn": "Name",
+                    "setColumn": "Set",
+                    "quantityColumn": "Quantity",
+                    "foilColumn": "Foil",
+                    "priceColumn": "Price"
+                },
+                "min": "You must select at least 1 row!",
+                "max": "You can select at most 100 rows!",
+                "count_a": " selected of ",
+                "count_b": " (",
+                "count_c": " total)",
+                "showDisabled": "Show disabled",
                 "submit": "Fill page!"
-            }
-        },
-        "success": {
-            "title": "Listings imported successfully!",
-            "body": {
-                "1": "1 row was imported!",
-                "n": "$1 rows were imported!"
             },
-            "table": {
-                "numberColumn": "#",
-                "nameColumn": "Name",
-                "quantityColumn": "Quantity",
-                "foilColumn": "Foil",
-                "priceColumn": "Price"
-            },
-            "close": "Close"
+            "successAlert_a": " row(s) filled successfully."
         }
     }
 }
