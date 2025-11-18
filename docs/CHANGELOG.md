@@ -8,6 +8,9 @@
 - Modified form flow to work around batches and use row selection instead.
 - Foil values now show an icon instead of "yes" / "no".
 
+### Bugfixes
+- Added proper error handling to the import form.
+
 ### Housekeeping
 - Upgraded engines:
   - `node`: `22.20.0` -> `24.11.0`.
