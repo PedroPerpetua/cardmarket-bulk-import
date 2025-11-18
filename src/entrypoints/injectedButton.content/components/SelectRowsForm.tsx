@@ -6,9 +6,9 @@ import { Button, Form, Pagination, Stack, Table } from 'react-bootstrap';
 import { Controller, useForm } from 'react-hook-form';
 import * as yup from 'yup';
 
-import { setInArray, splitIntoBatches } from '../utils';
-import type { ParsedRow } from '../utils/parse';
-import usePaginatedArray from '../utils/usePaginatedArray';
+import { splitIntoBatches, setInArray } from '../../../utils';
+import usePaginatedArray from '../../../utils/usePaginatedArray';
+import type { ParsedRow } from '../parse';
 
 type SelectedRowsFormValues = {
   selectedRows: number[],
@@ -42,7 +42,13 @@ function SelectRowsForm({ rows, onSubmit }: SelectRowsFormProps) {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [showDisabled]);
 
-  const { control, watch, handleSubmit, formState, setValue } = useForm<SelectedRowsFormValues>({
+  const {
+    control,
+    watch,
+    handleSubmit,
+    formState: { errors: formErrors },
+    setValue,
+  } = useForm<SelectedRowsFormValues>({
     resolver: yupResolver(validationSchema),
     // Select the first 100
     defaultValues: { selectedRows: enabledRows.slice(0, 100).map((r) => r.id) },
@@ -100,8 +106,11 @@ function SelectRowsForm({ rows, onSubmit }: SelectRowsFormProps) {
               <th className="col-md-1">
                 { i18n.t('injectedButton.modal.selectRowsForm.table.checkColumn') }
               </th>
-              <th className="col-md-8">
+              <th className="col-md-7">
                 { i18n.t('injectedButton.modal.selectRowsForm.table.nameColumn') }
+              </th>
+              <th className="col-md-1">
+                { i18n.t('injectedButton.modal.selectRowsForm.table.setColumn') }
               </th>
               <th className="col-md-1">
                 { i18n.t('injectedButton.modal.selectRowsForm.table.quantityColumn') }
@@ -137,6 +146,7 @@ function SelectRowsForm({ rows, onSubmit }: SelectRowsFormProps) {
                     />
                   </td>
                   <td>{ r.name }</td>
+                  <td>{ r.set }</td>
                   <td>{ r.quantity }</td>
                   <td>
                     <span
@@ -159,18 +169,19 @@ function SelectRowsForm({ rows, onSubmit }: SelectRowsFormProps) {
                   <td>&nbsp;</td>
                   <td>&nbsp;</td>
                   <td>&nbsp;</td>
+                  <td>&nbsp;</td>
                 </tr>
               ))
             }
           </tbody>
         </Table>
         {
-          formState.errors.selectedRows && (
+          formErrors.selectedRows && (
             <>
               { /* Bootstrap invalid-feedback requires an .is-invalid sibling */ }
               <div className="is-invalid d-none" />
               <div className="invalid-feedback mt-0 fs-6">
-                { formState.errors.selectedRows?.message }
+                { formErrors.selectedRows?.message }
               </div>
             </>
           )

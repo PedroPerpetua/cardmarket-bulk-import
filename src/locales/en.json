@@ -44,11 +44,15 @@
             "importCsvForm": {
                 "files": {
                     "label": "CSV File",
-                    "required": "You must upload a file."
+                    "required": "You must upload a file.",
+                    "invalid": "Could not parse this file."
                 },
                 "nameColumn": {
                     "label": "Name Column",
                     "required": "You must select a column"
+                },
+                "setColumn": {
+                    "label": "Set Column"
                 },
                 "quantityColumn": {
                     "label": "Quantity Column"
@@ -59,12 +63,14 @@
                 "priceColumn": {
                     "label": "Price Column"
                 },
-                "submit": "Select rows"
+                "submit": "Select rows",
+                "error": "An unknown error occurred parsing this file. Please make sure the CSV is correctly formatted."
             },
             "selectRowsForm": {
                 "table": {
                     "checkColumn": "Fill",
                     "nameColumn": "Name",
+                    "setColumn": "Set",
                     "quantityColumn": "Quantity",
                     "foilColumn": "Foil",
                     "priceColumn": "Price"
