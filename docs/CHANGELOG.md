@@ -1,7 +1,7 @@
 # Changelog
 
 
-## [UNRELEASED]
+## [1.1.0] 2025-11-18
 
 ### Changes
 - Sets now supported! You can select a column for "SET" and the extension will only match cards from your CSV that are part of the set you have open (as given by the `idExpansion` in the page).

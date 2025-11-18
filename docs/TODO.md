@@ -1,4 +1,5 @@
 # Features
+- Support other games.
 - Support more import formats.
 - Support "copy and paste" a CSV directly onto the form.
 - Support more properties (language, signed, etc).
