@@ -22,7 +22,9 @@ function ReportIssuePanel() {
           { i18n.t('popup.panels.reportIssue.github_c') }
           <br />
           <br />
-          { i18n.t('popup.panels.reportIssue.github_d', [browser.runtime.getManifest().version]) }
+          { i18n.t('popup.panels.reportIssue.github_d') }
+          { browser.runtime.getManifest().version }
+          { i18n.t('popup.panels.reportIssue.github_e') }
         </p>
       </div>
     </Panel>

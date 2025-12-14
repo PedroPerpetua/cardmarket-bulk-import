@@ -1,3 +1,5 @@
+import type { GeneratedI18nStructure } from '../../.wxt/i18n';
+
 export function normalizeString(str?: string) {
   if (!str) return '';
   return str.normalize('NFD').replace(/\p{Diacritic}/gu, '').toLowerCase();
@@ -25,3 +27,9 @@ export function splitIntoBatches(count: number, batchSize: number = 100) {
   }
   return retval;
 }
+
+export type TranslationKey = keyof GeneratedI18nStructure;
+
+export type ArrayElement<
+  ArrayType extends readonly unknown[],
+> = ArrayType extends readonly (infer ElementType)[] ? ElementType : never;

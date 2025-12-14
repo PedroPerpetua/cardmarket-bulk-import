@@ -6,23 +6,25 @@ import { createPortal } from 'react-dom';
 import ImportCsvForm from './components/ImportCsvForm';
 import SelectRowsForm from './components/SelectRowsForm';
 import SuccessAlert from './components/SuccessAlert';
-import { fillPage } from './parse';
-import type { ParsedRow } from './parse';
+import type { ParsedRow } from './game-manager';
+import useGameManager from './game-manager/useGameManager';
 import IconTransparent from '../../assets/icon-transparent.png';
 
 function App() {
   const [show, setShow] = useState(false);
   const [importedRows, setImportedRows] = useState<ParsedRow[] | null>(null);
   const [filledCount, setFilledCount] = useState<number | null>(null);
+  const { fillPage } = useGameManager();
 
   let content = (<ImportCsvForm onSubmit={(res) => setImportedRows(res)} />);
   if (importedRows !== null) content = (
     <SelectRowsForm
       rows={importedRows}
       onSubmit={(rows) => {
-        const filled = fillPage(rows);
-        setShow(false);
-        setFilledCount(filled);
+        fillPage(rows).then((filled) => {
+          setShow(false);
+          setFilledCount(filled);
+        });
       }}
     />
   );

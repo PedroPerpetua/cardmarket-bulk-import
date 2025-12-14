@@ -19,7 +19,8 @@
                 "github_a": "If you've found a problem while using this extension you can report it in the ",
                 "github_b": "Github issues",
                 "github_c": ".",
-                "github_d": "Please make sure to include the name of the browser where you found the issue, and the version you are using (v$1)."
+                "github_d": "Please make sure to include the name of the browser where you found the issue, and the version you are using",
+                "github_e": "."
             },
             "aboutMe": {
                 "button": "About",
@@ -42,39 +43,10 @@
         "modal": {
             "title": "Import listings from CSV",
             "importCsvForm": {
-                "files": {
-                    "label": "CSV File",
-                    "required": "You must upload a file.",
-                    "invalid": "Could not parse this file."
-                },
-                "nameColumn": {
-                    "label": "Name Column",
-                    "required": "You must select a column"
-                },
-                "setColumn": {
-                    "label": "Set Column"
-                },
-                "quantityColumn": {
-                    "label": "Quantity Column"
-                },
-                "foilColumn": {
-                    "label": "Foil Column"
-                },
-                "priceColumn": {
-                    "label": "Price Column"
-                },
                 "submit": "Select rows",
                 "error": "An unknown error occurred parsing this file. Please make sure the CSV is correctly formatted."
             },
             "selectRowsForm": {
-                "table": {
-                    "checkColumn": "Fill",
-                    "nameColumn": "Name",
-                    "setColumn": "Set",
-                    "quantityColumn": "Quantity",
-                    "foilColumn": "Foil",
-                    "priceColumn": "Price"
-                },
                 "min": "You must select at least 1 row!",
                 "max": "You can select at most 100 rows!",
                 "count_a": " selected of ",
@@ -84,6 +56,47 @@
                 "submit": "Fill page!"
             },
             "successAlert_a": " row(s) filled successfully."
+        },
+        "gameManagers": {
+            "common": {
+                "importCsvForm": {
+                    "files": {
+                        "label": "CSV File",
+                        "required": "You must upload a file.",
+                        "invalid": "Could not parse this file."
+                    },
+                    "name": {
+                        "label": "Name Column",
+                        "required": "You must select a column"
+                    },
+                    "quantity": {
+                        "label": "Quantity Column"
+                    },
+                    "price": {
+                        "label": "Price Column"
+                    }
+                },
+                "selectRowsFormTable": {
+                    "check": "Fill",
+                    "name": "Name",
+                    "quantity": "Quantity",
+                    "price": "Price"
+                }
+            },
+            "mtg": {
+                "importCsvForm": {
+                    "set": {
+                        "label": "Set Column"
+                    },
+                    "isFoil": {
+                        "label": "Foil Column"
+                    }
+                },
+                "selectRowsFormTable": {
+                    "set": "Set",
+                    "isFoil": "Foil"
+                }
+            }
         }
     }
 }
