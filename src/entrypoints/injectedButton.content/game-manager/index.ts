@@ -1,5 +1,6 @@
 import * as yup from 'yup';
 
+import GenericGameManager from './managers/generic';
 import MtgGameManager from './managers/mtg';
 import type { ArrayElement, TranslationKey } from '../../../utils';
 
@@ -87,6 +88,11 @@ export type ParsedRow = ArrayElement<Awaited<ReturnType<GameManagerInterface['pa
  * @returns The GameManager that should be used for the current URL.
  */
 export function getCurrentManager(): GameManagerInterface {
-  // @ts-expect-error // We return a specific under the guise of a generic
-  return MtgGameManager;
+  switch (window.location.pathname) {
+    case '/en/Magic/Stock/ListingMethods/BulkListing':
+      // @ts-expect-error // We return a specific under the guise of a generic
+      return MtgGameManager;
+    default:
+      return GenericGameManager;
+  }
 }

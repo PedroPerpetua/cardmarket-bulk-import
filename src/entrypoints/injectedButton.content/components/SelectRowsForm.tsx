@@ -184,8 +184,11 @@ function SelectRowsForm({ rows, onSubmit }: SelectRowsFormProps) {
                 <tr key={i} style={{ opacity: 0.8 }}>
                   <td>&nbsp;</td>
                   <td>&nbsp;</td>
-                  <td>&nbsp;</td>
-                  <td>&nbsp;</td>
+                  {
+                    Object.entries(extraTableColumns).filter(([, v]) => !!v).map(([k]) => (
+                      <td key={k}>&nbsp;</td>
+                    ))
+                  }
                   <td>&nbsp;</td>
                   <td>&nbsp;</td>
                 </tr>

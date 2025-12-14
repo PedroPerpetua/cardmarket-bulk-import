@@ -61,10 +61,10 @@ const MtgGameManager: GameManagerInterface<'set' | 'isFoil', { set: string, isFo
         id: i,
         name: parsedName,
         set: set,
-        quantity: columnMapping['quantity'] ? (Number(row[columnMapping['quantity']]) || 0) : 0,
         isFoil: columnMapping['isFoil']
           ? VALID_FOIL_VALUES.includes(String(row[columnMapping['isFoil']]).toLowerCase())
           : false,
+        quantity: columnMapping['quantity'] ? (Number(row[columnMapping['quantity']]) || 0) : 0,
         price: columnMapping['price'] ? (Number(row[columnMapping['price']]) || 0) : 0,
         enabled,
       });
