@@ -7,7 +7,7 @@ import ReactDOM from 'react-dom/client';
 import App from './App';
 
 export default defineContentScript({
-  matches: ['*://*.cardmarket.com/*/Magic/Stock/ListingMethods/BulkListing*'],
+  matches: ['*://*.cardmarket.com/*/*/Stock/ListingMethods/BulkListing*'],
   main: (ctx) => {
     const ui = createIntegratedUi(ctx, {
       position: 'inline',

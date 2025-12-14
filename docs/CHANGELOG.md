@@ -1,5 +1,24 @@
 # Changelog
 
+## [Unreleased]
+
+### Changes
+- Added GameManagerInterface and GenericGameManager! These handle different support for different games. Now all games support at the least the GenericGameManager, so imports should be possible for all.
+
+### Housekeeping:
+- Upgraded engines:
+  - `node`: `24.11.0` -> `24.12.0`.
+  - `yarn`: `4.11.0` -> `4.12.0`.
+- Upgraded dependencies:
+  - `react`: `19.2.0` -> `19.2.3`.
+  - `react-dom`: `19.2.0` -> `19.2.3`.
+  - `react-hook-form`: `7.66.1` -> `7.68.0`.
+  - `@stylistic/eslint-plugin`: `5.6.0` -> `5.6.1`.
+  - `@types/react`: `19.2.6` -> `19.2.7`.
+  - `eslint`: `9.39.1` -> `9.39.2`.
+  - `eslint-plugin-react-refresh`: `0.4.24` -> `0.4.25`.
+  - `typescript-eslint`: `8.47.0` -> `8.49.0`.
+
 
 ## [1.1.0] 2025-11-18
 
@@ -13,7 +32,7 @@
 
 ### Housekeeping
 - Upgraded engines:
-  - `node`: `22.20.0` -> `24.11.0`.
+  - `node`: `22.20.0` -> `24.11.1`.
   - `yarn`: `4.10.3` -> `4.11.0`.
 - Upgraded dependencies:
   - `react`: `19.1.1` -> `19.2.0`.
