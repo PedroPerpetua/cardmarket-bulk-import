@@ -6,7 +6,7 @@ import { readCsv } from '../../../../utils/csv';
 import { getWebsiteRows, priceElSelector, quantityElSelector } from '../utils';
 
 /**
- * The GenericGameManager is a Game Manager that's capable of handling **only the basic required
+ * The GenericGameManager is a game manager that's capable of handling **only the basic required
  * fields** - name, quantity and price. It should be the default returned when no other appropriate
  * managers are found.
  */

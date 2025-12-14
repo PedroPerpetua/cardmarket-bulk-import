@@ -3,7 +3,7 @@
 ## [Unreleased]
 
 ### Changes
-- Added GameManagers and GenericGameManager! These handle different support for different games. Now all games support at the least the GenericGameManager, so imports should be possible for all.
+- Added GameManagerInterface and GenericGameManager! These handle different support for different games. Now all games support at the least the GenericGameManager, so imports should be possible for all.
 
 ### Housekeeping:
 - Upgraded engines:
