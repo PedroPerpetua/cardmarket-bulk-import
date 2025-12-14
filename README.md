@@ -12,7 +12,7 @@ Download it on the [Chrome Webstore](https://chromewebstore.google.com/detail/ca
 ## Common questions
 
 ### Does this extension support all games available on Cardmarket?
-No. We currently only support MTG. There are plans to support more in the future.
+Yes. Currently Magic is the one that supports more properties, but all gams support basic importation. More fields planned in the future (PRs welcome!).
 
 ### Will this extension handle multiple rows of the same card?
 **Yes!** If you have, for example, foil and non foil rows on your CSV, the extension will add them separately.
