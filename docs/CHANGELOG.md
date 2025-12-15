@@ -1,6 +1,7 @@
 # Changelog
 
-## [Unreleased]
+
+## [1.2.0] 2025-12-15
 
 ### Changes
 - Added GameManagerInterface and GenericGameManager! These handle different support for different games. Now all games support at the least the GenericGameManager, so imports should be possible for all.

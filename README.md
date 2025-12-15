@@ -24,7 +24,7 @@ Yes. Currently Magic is the one that supports more properties, but all games sup
 **Yes!** Although they have not checked / vetted the extension, I have confirmed with support that it was okay for me to publish it and it's okay for users to use.
 
 ### Can this extension steal my data?
-Even though the extension is allowed to read and write specifically on websites where the url matches _\*://\*.cardmarket.com/\*/Magic/Stock/ListingMethods/BulkListing\*_, the extension **does not read or write over your personal information**. It simply reads and fills the table of bulk listing in order to do it's job!
+Even though the extension is allowed to read and write specifically on websites where the url matches _\*://\*.cardmarket.com/\*/\*/Stock/ListingMethods/BulkListing\*_, the extension **does not read or write over your personal information**. It simply reads and fills the table of bulk listing in order to do it's job!
 
 The entire code is open source and you can verify it here; you can even clone this repository and launch it yourself locally if you don't trust the store version.
 
