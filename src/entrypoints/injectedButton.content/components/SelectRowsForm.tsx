@@ -8,13 +8,14 @@ import * as yup from 'yup';
 
 import { splitIntoBatches, setInArray } from '../../../utils';
 import usePaginatedArray from '../../../utils/usePaginatedArray';
-import type { ParsedRow } from '../parse';
+import type { ParsedRow } from '../game-manager';
+import useGameManager from '../game-manager/useGameManager';
 
 type SelectedRowsFormValues = {
   selectedRows: number[],
 };
 
-const validationSchema: yup.ObjectSchema<SelectedRowsFormValues> = yup.object().shape({
+const validationSchema: yup.ObjectSchema<SelectedRowsFormValues> = yup.object({
   selectedRows: yup.array().of(yup.number().required())
     .min(1, i18n.t('injectedButton.modal.selectRowsForm.min'))
     .max(100, i18n.t('injectedButton.modal.selectRowsForm.max'))
@@ -27,6 +28,7 @@ type SelectRowsFormProps = {
 };
 
 function SelectRowsForm({ rows, onSubmit }: SelectRowsFormProps) {
+  const { extraTableColumns } = useGameManager();
   const [showDisabled, setShowDisabled] = useState(false);
   const enabledRows = useMemo(() => rows.filter((r) => r.enabled), [rows]);
   const filteredRows = useMemo(
@@ -53,14 +55,14 @@ function SelectRowsForm({ rows, onSubmit }: SelectRowsFormProps) {
     // Select the first 100
     defaultValues: { selectedRows: enabledRows.slice(0, 100).map((r) => r.id) },
   });
-  const submitFn = (data: SelectedRowsFormValues) => {
-    onSubmit(rows.filter((r) => data.selectedRows.includes(r.id)));
-  };
+  const submitFn = handleSubmit(
+    (data) => onSubmit(rows.filter((r) => data.selectedRows.includes(r.id))),
+  );
 
   const selectedCount = watch('selectedRows').length;
 
   return (
-    <Form noValidate onSubmit={handleSubmit(submitFn)}>
+    <Form noValidate onSubmit={submitFn}>
       <Stack gap={3}>
         <Stack
           direction="horizontal"
@@ -104,22 +106,31 @@ function SelectRowsForm({ rows, onSubmit }: SelectRowsFormProps) {
           <thead>
             <tr>
               <th className="col-md-1">
-                { i18n.t('injectedButton.modal.selectRowsForm.table.checkColumn') }
+                { i18n.t('injectedButton.gameManagers.common.selectRowsFormTable.check') }
               </th>
-              <th className="col-md-7">
-                { i18n.t('injectedButton.modal.selectRowsForm.table.nameColumn') }
+              <th className="col">
+                { i18n.t('injectedButton.gameManagers.common.selectRowsFormTable.name') }
+              </th>
+              {
+                Object.entries(extraTableColumns).map(([key, value]) => {
+                  if (!value) return null;
+                  if (typeof value === 'string') return (
+                    <th key={key} className="col-md-1">
+                      { i18n.t(value) }
+                    </th>
+                  );
+                  return (
+                    <th key={key} className={`col-md-${value.size}`}>
+                      { i18n.t(value.label) }
+                    </th>
+                  );
+                })
+              }
+              <th className="col-md-1">
+                { i18n.t('injectedButton.gameManagers.common.selectRowsFormTable.quantity') }
               </th>
               <th className="col-md-1">
-                { i18n.t('injectedButton.modal.selectRowsForm.table.setColumn') }
-              </th>
-              <th className="col-md-1">
-                { i18n.t('injectedButton.modal.selectRowsForm.table.quantityColumn') }
-              </th>
-              <th className="col-md-1">
-                { i18n.t('injectedButton.modal.selectRowsForm.table.foilColumn') }
-              </th>
-              <th className="col-md-1">
-                { i18n.t('injectedButton.modal.selectRowsForm.table.priceColumn') }
+                { i18n.t('injectedButton.gameManagers.common.selectRowsFormTable.price') }
               </th>
             </tr>
           </thead>
@@ -146,17 +157,24 @@ function SelectRowsForm({ rows, onSubmit }: SelectRowsFormProps) {
                     />
                   </td>
                   <td>{ r.name }</td>
-                  <td>{ r.set }</td>
+                  {
+                    Object.entries(extraTableColumns).filter(([, v]) => !!v).map(([k]) => {
+                      const value = r[k];
+                      if (typeof value === 'boolean') return (
+                        <td key={k}>
+                          <span
+                            className={
+                              value
+                                ? 'fonticon-check-circle text-success'
+                                : 'fonticon-cross-circle text-danger'
+                            }
+                          />
+                        </td>
+                      );
+                      return (<td key={k}>{ String(value) }</td>);
+                    })
+                  }
                   <td>{ r.quantity }</td>
-                  <td>
-                    <span
-                      className={
-                        r.isFoil
-                          ? 'fonticon-check-circle text-success'
-                          : 'fonticon-cross-circle text-danger'
-                      }
-                    />
-                  </td>
                   <td>{ `${r.price.toFixed(2)}€` }</td>
                 </tr>
               ))
@@ -166,8 +184,11 @@ function SelectRowsForm({ rows, onSubmit }: SelectRowsFormProps) {
                 <tr key={i} style={{ opacity: 0.8 }}>
                   <td>&nbsp;</td>
                   <td>&nbsp;</td>
-                  <td>&nbsp;</td>
-                  <td>&nbsp;</td>
+                  {
+                    Object.entries(extraTableColumns).filter(([, v]) => !!v).map(([k]) => (
+                      <td key={k}>&nbsp;</td>
+                    ))
+                  }
                   <td>&nbsp;</td>
                   <td>&nbsp;</td>
                 </tr>

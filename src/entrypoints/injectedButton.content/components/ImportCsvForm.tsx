@@ -9,35 +9,34 @@ import * as yup from 'yup';
 import ColumnSelect from './ColumnSelect';
 import { getCsvColumns } from '../../../utils/csv';
 import useAsyncFn from '../../../utils/useAsyncFn';
-import { parseCsv } from '../parse';
-import type { ParsedRow } from '../parse';
+import type { ParsedRow } from '../game-manager';
+import useGameManager from '../game-manager/useGameManager';
 
-export type ImportCsvFormValues = {
+type BaseImportFormValues = {
   files: FileList,
-  nameColumn: string,
-  setColumn?: string,
-  quantityColumn?: string,
-  foilColumn?: string,
-  priceColumn?: string,
+  name: string,
+  quantity: string | undefined,
+  price: string | undefined,
 };
 
-const validationSchema: yup.ObjectSchema<ImportCsvFormValues> = yup.object({
+const baseValidationSchema: yup.ObjectSchema<BaseImportFormValues> = yup.object({
   files: yup.mixed<FileList>()
-    .required(i18n.t('injectedButton.modal.importCsvForm.files.required')),
-  nameColumn: yup.string()
-    .required(i18n.t('injectedButton.modal.importCsvForm.nameColumn.required')),
-  setColumn: yup.string(),
-  quantityColumn: yup.string(),
-  foilColumn: yup.string(),
-  priceColumn: yup.string(),
+    .required(i18n.t('injectedButton.gameManagers.common.importCsvForm.files.required')),
+  name: yup.string()
+    .required(i18n.t('injectedButton.gameManagers.common.importCsvForm.name.required')),
+  quantity: yup.string(),
+  price: yup.string(),
 });
+
+type ImportFormValues = BaseImportFormValues & Record<string, string | undefined>;
 
 type ImportCsvFormProps = {
   onSubmit: (data: ParsedRow[]) => void,
 };
 
 function ImportCsvForm({ onSubmit }: ImportCsvFormProps) {
-  const [{ value: columns, loading, error }, getColumns] = useAsyncFn(getCsvColumns);
+  const { extraColumns, extraValidationSchema, parseCsv } = useGameManager();
+  const [{ value: csvColumns, loading, error }, getColumns] = useAsyncFn(getCsvColumns);
   const {
     control,
     register,
@@ -46,26 +45,22 @@ function ImportCsvForm({ onSubmit }: ImportCsvFormProps) {
     setError,
     clearErrors,
     formState: { errors: formErrors, touchedFields },
-  } = useForm<ImportCsvFormValues>({
-    resolver: yupResolver(validationSchema),
+  } = useForm<ImportFormValues, undefined, ImportFormValues>({
+    // @ts-ignore // yup doesn't like the concat here
+    resolver: yupResolver(baseValidationSchema.concat(extraValidationSchema)),
   });
 
-  const submitFn = async (data: ImportCsvFormValues) => {
+  const submitFn = handleSubmit(async (data) => {
+    const { files, ...mapping } = data;
     try {
-      const res = await parseCsv(data.files[0], {
-        name: data.nameColumn,
-        set: data.setColumn,
-        quantity: data.quantityColumn,
-        isFoil: data.foilColumn,
-        price: data.priceColumn,
-      });
+      const res = await parseCsv(files[0], mapping);
       onSubmit(res);
     }
     catch (e) {
       console.error('[cardmarket-bulk-import] Failed to Submit CSV file.', e);
       setError('root', { message: i18n.t('injectedButton.modal.importCsvForm.error') });
     }
-  };
+  });
 
   const files = watch('files');
   useEffect(() => {
@@ -78,48 +73,48 @@ function ImportCsvForm({ onSubmit }: ImportCsvFormProps) {
       clearErrors('files');
       return;
     };
-    setError('files', { message: i18n.t('injectedButton.modal.importCsvForm.files.invalid') });
+    setError('files', {
+      message: i18n.t('injectedButton.gameManagers.common.importCsvForm.files.invalid'),
+    });
     console.error('[cardmarket-bulk-import] Failed to parse CSV file.', error);
   }, [error, clearErrors, setError]);
 
   let columnsEl = null;
   if (loading) columnsEl = (<Spinner />);
-  else if (columns) columnsEl = (
+  else if (csvColumns) columnsEl = (
     <>
-      <ColumnSelect<ImportCsvFormValues>
+      <ColumnSelect
         control={control}
-        formId="importCsvForm.nameColumn"
-        name="nameColumn"
-        label={i18n.t('injectedButton.modal.importCsvForm.nameColumn.label')}
-        options={columns}
+        formId="importCsvForm.name"
+        name="name"
+        label={i18n.t('injectedButton.gameManagers.common.importCsvForm.name.label')}
+        options={csvColumns}
       />
-      <ColumnSelect<ImportCsvFormValues>
+      {
+        Object.entries(extraColumns).map(([name, label]) => (
+          <ColumnSelect
+            key={name}
+            control={control}
+            formId={`importCsvForm.${name}`}
+            name={name}
+            label={i18n.t(label)}
+            options={csvColumns}
+          />
+        ))
+      }
+      <ColumnSelect
         control={control}
-        formId="importCsvForm.setColumn"
-        name="setColumn"
-        label={i18n.t('injectedButton.modal.importCsvForm.setColumn.label')}
-        options={columns}
+        formId="importCsvForm.quantity"
+        name="quantity"
+        label={i18n.t('injectedButton.gameManagers.common.importCsvForm.quantity.label')}
+        options={csvColumns}
       />
-      <ColumnSelect<ImportCsvFormValues>
+      <ColumnSelect
         control={control}
-        formId="importCsvForm.quantityColumn"
-        name="quantityColumn"
-        label={i18n.t('injectedButton.modal.importCsvForm.quantityColumn.label')}
-        options={columns}
-      />
-      <ColumnSelect<ImportCsvFormValues>
-        control={control}
-        formId="importCsvForm.foilColumn"
-        name="foilColumn"
-        label={i18n.t('injectedButton.modal.importCsvForm.foilColumn.label')}
-        options={columns}
-      />
-      <ColumnSelect<ImportCsvFormValues>
-        control={control}
-        formId="importCsvForm.priceColumn"
-        name="priceColumn"
-        label={i18n.t('injectedButton.modal.importCsvForm.priceColumn.label')}
-        options={columns}
+        formId="importCsvForm.price"
+        name="price"
+        label={i18n.t('injectedButton.gameManagers.common.importCsvForm.price.label')}
+        options={csvColumns}
       />
       <Button type="submit" className="mx-auto">
         { i18n.t('injectedButton.modal.importCsvForm.submit') }
@@ -128,10 +123,12 @@ function ImportCsvForm({ onSubmit }: ImportCsvFormProps) {
   );
 
   return (
-    <Form noValidate onSubmit={handleSubmit(submitFn)}>
+    <Form noValidate onSubmit={submitFn}>
       <Stack gap={2}>
         <Form.Group controlId="importCsvForm.files">
-          <Form.Label>{ i18n.t('injectedButton.modal.importCsvForm.files.label') }</Form.Label>
+          <Form.Label>
+            { i18n.t('injectedButton.gameManagers.common.importCsvForm.files.label') }
+          </Form.Label>
           <Form.Control
             type="file"
             accept=".csv"
