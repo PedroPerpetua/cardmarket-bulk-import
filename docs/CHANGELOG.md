@@ -1,6 +1,21 @@
 # Changelog
 
 
+## UNRELEASED
+
+### Housekeeping
+- Upgraded engines:
+  - `node`: `24.12.0` -> `24.13.0`.
+- Upgraded dependencies:
+  - `react-hook-form`: `7.68.0` -> `7.71.1`.
+  - `vite-plugin-node-polyfills`: `0.24.0` -> `0.25.0`.
+  - `@stylistic/eslint-plugin`: `5.6.1` -> `5.7.0`.
+  - `@types/react`: `19.2.7` ->  `19.2.9`.
+  - `eslint-plugin-react-refresh`: `0.4.25` ->  `0.4.26`.
+  - `typescript-eslint`: `8.49.0` ->  `8.53.1`.
+  - `wxt`: `0.20.11` ->  `0.20.13`.
+
+
 ## [1.2.0] 2025-12-15
 
 ### Changes

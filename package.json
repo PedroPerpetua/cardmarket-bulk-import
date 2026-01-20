@@ -27,15 +27,15 @@
     "react": "19.2.3",
     "react-bootstrap": "2.10.10",
     "react-dom": "19.2.3",
-    "react-hook-form": "7.68.0",
-    "vite-plugin-node-polyfills": "0.24.0",
+    "react-hook-form": "7.71.1",
+    "vite-plugin-node-polyfills": "0.25.0",
     "webext-bridge": "6.0.1",
     "yup": "1.7.1"
   },
   "devDependencies": {
-    "@stylistic/eslint-plugin": "5.6.1",
+    "@stylistic/eslint-plugin": "5.7.0",
     "@types/bootstrap": "5.2.10",
-    "@types/react": "19.2.7",
+    "@types/react": "19.2.9",
     "@types/react-dom": "19.2.3",
     "@wxt-dev/module-react": "1.1.5",
     "eslint": "9.39.2",
@@ -44,14 +44,14 @@
     "eslint-plugin-import": "2.32.0",
     "eslint-plugin-react": "7.37.5",
     "eslint-plugin-react-hooks": "7.0.1",
-    "eslint-plugin-react-refresh": "0.4.25",
+    "eslint-plugin-react-refresh": "0.4.26",
     "mtggraphql": "1.0.2",
     "typescript": "5.9.3",
-    "typescript-eslint": "8.49.0",
-    "wxt": "0.20.11"
+    "typescript-eslint": "8.53.1",
+    "wxt": "0.20.13"
   },
   "engines": {
-    "node": "24.12.0",
+    "node": "24.13.0",
     "yarn": "4.12.0"
   },
   "packageManager": "yarn@4.12.0"
