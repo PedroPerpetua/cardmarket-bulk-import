@@ -20,7 +20,6 @@ async function getMTGJSONDataImpl() {
       matchKeys: [
         set.code,
         set.codeV3,
-        set.parentCode,
         set.keyruneCode,
         set.id,
         set.mcmId,

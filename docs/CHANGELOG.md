@@ -3,6 +3,13 @@
 
 ## UNRELEASED
 
+### Changes
+- Improved set matching with mtgjson; now `keyruneCode` is also considered.
+
+### Bugfixes
+- Large pagination on the SelectedRowsForm no longer breaks layout.
+- Sets without a cardmarket id will no longer be matched.
+
 ### Housekeeping
 - Upgraded engines:
   - `node`: `24.12.0` -> `24.13.0`.
