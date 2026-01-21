@@ -36,7 +36,13 @@ function SelectRowsForm({ rows, onSubmit }: SelectRowsFormProps) {
     [enabledRows, rows, showDisabled],
   );
 
-  const { pageNumber, currentPage, setPage, emptyArr, indexArr } = usePaginatedArray(filteredRows);
+  const {
+    pageNumber,
+    currentPage,
+    setPage,
+    emptyArr,
+    indexArr,
+  } = usePaginatedArray(filteredRows, { maxPages: 15 });
 
   // Ensure that if we toggle the disabled, we're in a valid page
   useEffect(() => {
@@ -216,15 +222,19 @@ function SelectRowsForm({ rows, onSubmit }: SelectRowsFormProps) {
               ? (
                   <Pagination className="m-0">
                     {
-                      indexArr.map((pNumber) => (
-                        <Pagination.Item
-                          key={pNumber}
-                          onClick={() => setPage(pNumber)}
-                          active={pNumber === pageNumber}
-                        >
-                          { pNumber }
-                        </Pagination.Item>
-                      ))
+                      indexArr.map((pNumber) => typeof pNumber === 'number'
+                        ? (
+                            <Pagination.Item
+                              key={pNumber}
+                              onClick={() => setPage(pNumber)}
+                              active={pNumber === pageNumber}
+                            >
+                              { pNumber }
+                            </Pagination.Item>
+                          )
+                        : (
+                            <Pagination.Ellipsis key={pNumber} disabled />
+                          ))
                     }
                   </Pagination>
                 )
