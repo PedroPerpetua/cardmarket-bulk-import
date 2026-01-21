@@ -215,17 +215,80 @@ function SelectRowsForm({ rows, onSubmit }: SelectRowsFormProps) {
             indexArr.length > 1
               ? (
                   <Pagination className="m-0">
+                    <Pagination.First
+                      onClick={() => setPage(1)}
+                      disabled={pageNumber === 1}
+                    />
+                    <Pagination.Prev
+                      onClick={() => setPage(pageNumber - 1)}
+                      disabled={pageNumber === 1}
+                    />
                     {
-                      indexArr.map((pNumber) => (
-                        <Pagination.Item
-                          key={pNumber}
-                          onClick={() => setPage(pNumber)}
-                          active={pNumber === pageNumber}
-                        >
-                          { pNumber }
-                        </Pagination.Item>
-                      ))
+                      (() => {
+                        const totalPages = indexArr.length;
+                        const items: React.ReactNode[] = [];
+                        const siblingCount = 1;
+
+                        // Always show first page
+                        items.push(
+                          <Pagination.Item
+                            key={1}
+                            onClick={() => setPage(1)}
+                            active={pageNumber === 1}
+                          >
+                            1
+                          </Pagination.Item>,
+                        );
+
+                        // Show ellipsis after first page if needed
+                        if (pageNumber > 2 + siblingCount) {
+                          items.push(<Pagination.Ellipsis key="ellipsis-start" disabled />);
+                        }
+
+                        // Show pages around current page
+                        const startPage = Math.max(2, pageNumber - siblingCount);
+                        const endPage = Math.min(totalPages - 1, pageNumber + siblingCount);
+                        for (let i = startPage; i <= endPage; i++) {
+                          items.push(
+                            <Pagination.Item
+                              key={i}
+                              onClick={() => setPage(i)}
+                              active={pageNumber === i}
+                            >
+                              { i }
+                            </Pagination.Item>,
+                          );
+                        }
+
+                        // Show ellipsis before last page if needed
+                        if (pageNumber < totalPages - 1 - siblingCount) {
+                          items.push(<Pagination.Ellipsis key="ellipsis-end" disabled />);
+                        }
+
+                        // Always show last page if there is more than one page
+                        if (totalPages > 1) {
+                          items.push(
+                            <Pagination.Item
+                              key={totalPages}
+                              onClick={() => setPage(totalPages)}
+                              active={pageNumber === totalPages}
+                            >
+                              { totalPages }
+                            </Pagination.Item>,
+                          );
+                        }
+
+                        return items;
+                      })()
                     }
+                    <Pagination.Next
+                      onClick={() => setPage(pageNumber + 1)}
+                      disabled={pageNumber === indexArr.length}
+                    />
+                    <Pagination.Last
+                      onClick={() => setPage(indexArr.length)}
+                      disabled={pageNumber === indexArr.length}
+                    />
                   </Pagination>
                 )
               : <div /> // Empty div for the stack's justify content
