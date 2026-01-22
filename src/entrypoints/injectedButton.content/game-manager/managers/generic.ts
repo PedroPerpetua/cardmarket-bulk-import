@@ -19,13 +19,14 @@ const GenericGameManager: GameManagerInterface<never, Record<never, never>> = {
 
     for (const [i, row] of data.rows.entries()) {
       const parsedName = String(row[columnMapping['name']]);
-      const enabled = !!getWebsiteRows().find((el) => compareNormalized(el.textContent, parsedName));
+      const nameMatched = !!getWebsiteRows().find((el) => compareNormalized(el.textContent, parsedName));
       rows.push({
         id: i,
         name: parsedName,
         quantity: columnMapping['quantity'] ? (Number(row[columnMapping['quantity']]) || 0) : 0,
         price: columnMapping['price'] ? (Number(row[columnMapping['price']]) || 0) : 0,
-        enabled,
+        enabled: nameMatched,
+        nameMatched,
       });
     }
     return rows;

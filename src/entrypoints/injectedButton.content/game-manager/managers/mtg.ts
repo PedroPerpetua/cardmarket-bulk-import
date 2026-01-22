@@ -44,7 +44,8 @@ const MtgGameManager: GameManagerInterface<'set' | 'isFoil', { set: string, isFo
     for (const [i, row] of data.rows.entries()) {
       const parsedName = String(row[columnMapping['name']]);
 
-      let enabled = !!getWebsiteRows().find((el) => compareNormalized(el.textContent, parsedName));
+      const nameMatched = !!getWebsiteRows().find((el) => compareNormalized(el.textContent, parsedName));
+      let enabled = nameMatched;
       let set = columnMapping['set'] ? String(row[columnMapping['set']]) : '';
       if (set) {
         const data = await matchSetToCardmarketId(set);
@@ -67,6 +68,7 @@ const MtgGameManager: GameManagerInterface<'set' | 'isFoil', { set: string, isFo
         quantity: columnMapping['quantity'] ? (Number(row[columnMapping['quantity']]) || 0) : 0,
         price: columnMapping['price'] ? (Number(row[columnMapping['price']]) || 0) : 0,
         enabled,
+        nameMatched,
       });
     }
 

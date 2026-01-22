@@ -2,7 +2,8 @@ import { i18n } from '#imports';
 import { useEffect, useMemo, useState } from 'react';
 
 import { yupResolver } from '@hookform/resolvers/yup';
-import { Button, Form, Pagination, Stack, Table } from 'react-bootstrap';
+import clsx from 'clsx';
+import { Button, Form, OverlayTrigger, Pagination, Stack, Table, Tooltip } from 'react-bootstrap';
 import { Controller, useForm } from 'react-hook-form';
 import * as yup from 'yup';
 
@@ -145,7 +146,11 @@ function SelectRowsForm({ rows, onSubmit }: SelectRowsFormProps) {
               currentPage.map((r) => (
                 <tr
                   key={r.id}
-                  style={{ ...(!r.enabled && { opacity: 0.5, pointerEvents: 'none' }) }}
+                  className={clsx({
+                    'pe-none': !r.nameMatched,
+                    'opacity-25': !r.nameMatched,
+                    'opacity-50': r.nameMatched && !r.enabled,
+                  })}
                 >
                   <td>
                     <Controller
@@ -162,7 +167,21 @@ function SelectRowsForm({ rows, onSubmit }: SelectRowsFormProps) {
                       )}
                     />
                   </td>
-                  <td>{ r.name }</td>
+                  <td>
+                    <OverlayTrigger
+                      overlay={(
+                        <Tooltip>
+                          { i18n.t('injectedButton.modal.selectRowsForm.nameMatchedWarning') }
+                        </Tooltip>
+                      )}
+                      trigger={r.enabled ? [] : undefined}
+                      placement="left"
+                    >
+                      <span className={clsx(r.nameMatched && !r.enabled && 'text-warning')}>
+                        { r.name }
+                      </span>
+                    </OverlayTrigger>
+                  </td>
                   {
                     Object.entries(extraTableColumns).filter(([, v]) => !!v).map(([k]) => {
                       const value = r[k];
@@ -187,7 +206,7 @@ function SelectRowsForm({ rows, onSubmit }: SelectRowsFormProps) {
             }
             {
               emptyArr.map((i) => (
-                <tr key={i} style={{ opacity: 0.8 }}>
+                <tr key={i} className="opacity-25 pe-none">
                   <td>&nbsp;</td>
                   <td>&nbsp;</td>
                   {

@@ -10,6 +10,7 @@ export type CommonParsedRowFields = {
   quantity: number,
   price: number,
   enabled: boolean,
+  nameMatched: boolean,
 };
 
 /**
@@ -22,8 +23,8 @@ export type CommonParsedRowFields = {
  * for price and quantity. They can define any extra columns they wish to parse.
  *
  * All managers will have their own internal ParsedRow type, that must include at least, id, name,
- * quantity, price, and enabled. They can parse and display any extra fields, but these 5 fields
- * are required.
+ * quantity, price, enabled and nameMatched. They can parse and display any extra fields, but these
+ * 5 fields are required.
  */
 export type GameManagerInterface<
   ExtraColumnInputs extends string = string,

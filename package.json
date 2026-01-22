@@ -21,6 +21,7 @@
     "@wxt-dev/i18n": "0.2.4",
     "bootstrap": "5.3.8",
     "classnames": "2.5.1",
+    "clsx": "2.1.1",
     "csv-parse": "6.1.0",
     "fuse.js": "7.1.0",
     "memoize": "10.2.0",
