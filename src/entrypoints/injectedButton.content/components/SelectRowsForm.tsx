@@ -32,24 +32,6 @@ function SelectRowsForm({ rows, onSubmit }: SelectRowsFormProps) {
   const { extraTableColumns } = useGameManager();
   const [showDisabled, setShowDisabled] = useState(false);
   const enabledRows = useMemo(() => rows.filter((r) => r.enabled), [rows]);
-  const filteredRows = useMemo(
-    () => showDisabled ? rows : enabledRows,
-    [enabledRows, rows, showDisabled],
-  );
-
-  const {
-    pageNumber,
-    currentPage,
-    setPage,
-    emptyArr,
-    indexArr,
-  } = usePaginatedArray(filteredRows, { maxPages: 15 });
-
-  // Ensure that if we toggle the disabled, we're in a valid page
-  useEffect(() => {
-    setPage(pageNumber);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [showDisabled]);
 
   const {
     control,
@@ -66,7 +48,28 @@ function SelectRowsForm({ rows, onSubmit }: SelectRowsFormProps) {
     (data) => onSubmit(rows.filter((r) => data.selectedRows.includes(r.id))),
   );
 
-  const selectedCount = watch('selectedRows').length;
+  const selected = watch('selectedRows');
+
+  const filteredRows = useMemo(
+    () => {
+      if (showDisabled) return rows;
+      return rows.filter((r) => r.enabled || selected.includes(r.id));
+    }, [rows, selected, showDisabled],
+  );
+
+  const {
+    pageNumber,
+    currentPage,
+    setPage,
+    emptyArr,
+    indexArr,
+  } = usePaginatedArray(filteredRows, { maxPages: 15 });
+
+  // Ensure that if we toggle the disabled, we're in a valid page
+  useEffect(() => {
+    setPage(pageNumber);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [showDisabled]);
 
   return (
     <Form noValidate onSubmit={submitFn}>
@@ -78,7 +81,7 @@ function SelectRowsForm({ rows, onSubmit }: SelectRowsFormProps) {
           <Stack direction="horizontal" gap={2}>
             <h5>
               {
-                selectedCount.toString()
+                selected.length.toString()
                 + i18n.t('injectedButton.modal.selectRowsForm.count_a')
                 + enabledRows.length.toString()
                 + i18n.t('injectedButton.modal.selectRowsForm.count_b')

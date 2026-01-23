@@ -4,6 +4,7 @@
 ## UNRELEASED
 
 ### Changes
+- Added the ability to select disabled rows that still match the form.
 - Improved set matching with mtgjson; now `keyruneCode` is also considered.
 
 ### Bugfixes
