@@ -1,7 +1,7 @@
 # Changelog
 
 
-## UNRELEASED
+## [1.3.0] 2026-01-32
 
 ### Changes
 - Added the ability to select disabled rows that still match the form.
