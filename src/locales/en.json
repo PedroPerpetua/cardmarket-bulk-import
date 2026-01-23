@@ -53,6 +53,8 @@
                 "count_b": " (",
                 "count_c": " total)",
                 "showDisabled": "Show disabled",
+                "nameMatchedWarning": "This item does not meet all form requirements, but may still be filled",
+                "nameMatchedTooltip": "This item has been matched to this row",
                 "submit": "Fill page!"
             },
             "successAlert_a": " row(s) filled successfully."

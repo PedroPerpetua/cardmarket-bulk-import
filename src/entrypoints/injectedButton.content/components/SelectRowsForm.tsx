@@ -2,7 +2,8 @@ import { i18n } from '#imports';
 import { useEffect, useMemo, useState } from 'react';
 
 import { yupResolver } from '@hookform/resolvers/yup';
-import { Button, Form, Pagination, Stack, Table } from 'react-bootstrap';
+import clsx from 'clsx';
+import { Button, Form, OverlayTrigger, Pagination, Stack, Table, Tooltip } from 'react-bootstrap';
 import { Controller, useForm } from 'react-hook-form';
 import * as yup from 'yup';
 
@@ -28,21 +29,9 @@ type SelectRowsFormProps = {
 };
 
 function SelectRowsForm({ rows, onSubmit }: SelectRowsFormProps) {
-  const { extraTableColumns } = useGameManager();
+  const gameManager = useGameManager();
   const [showDisabled, setShowDisabled] = useState(false);
   const enabledRows = useMemo(() => rows.filter((r) => r.enabled), [rows]);
-  const filteredRows = useMemo(
-    () => showDisabled ? rows : enabledRows,
-    [enabledRows, rows, showDisabled],
-  );
-
-  const { pageNumber, currentPage, setPage, emptyArr, indexArr } = usePaginatedArray(filteredRows);
-
-  // Ensure that if we toggle the disabled, we're in a valid page
-  useEffect(() => {
-    setPage(pageNumber);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [showDisabled]);
 
   const {
     control,
@@ -59,7 +48,28 @@ function SelectRowsForm({ rows, onSubmit }: SelectRowsFormProps) {
     (data) => onSubmit(rows.filter((r) => data.selectedRows.includes(r.id))),
   );
 
-  const selectedCount = watch('selectedRows').length;
+  const selected = watch('selectedRows');
+
+  const filteredRows = useMemo(
+    () => {
+      if (showDisabled) return rows;
+      return rows.filter((r) => r.enabled || selected.includes(r.id));
+    }, [rows, selected, showDisabled],
+  );
+
+  const {
+    pageNumber,
+    currentPage,
+    setPage,
+    emptyArr,
+    indexArr,
+  } = usePaginatedArray(filteredRows, { maxPages: 15 });
+
+  // Ensure that if we toggle the disabled, we're in a valid page
+  useEffect(() => {
+    setPage(pageNumber);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [showDisabled]);
 
   return (
     <Form noValidate onSubmit={submitFn}>
@@ -71,7 +81,7 @@ function SelectRowsForm({ rows, onSubmit }: SelectRowsFormProps) {
           <Stack direction="horizontal" gap={2}>
             <h5>
               {
-                selectedCount.toString()
+                selected.length.toString()
                 + i18n.t('injectedButton.modal.selectRowsForm.count_a')
                 + enabledRows.length.toString()
                 + i18n.t('injectedButton.modal.selectRowsForm.count_b')
@@ -112,7 +122,7 @@ function SelectRowsForm({ rows, onSubmit }: SelectRowsFormProps) {
                 { i18n.t('injectedButton.gameManagers.common.selectRowsFormTable.name') }
               </th>
               {
-                Object.entries(extraTableColumns).map(([key, value]) => {
+                Object.entries(gameManager.extraTableColumns).map(([key, value]) => {
                   if (!value) return null;
                   if (typeof value === 'string') return (
                     <th key={key} className="col-md-1">
@@ -139,7 +149,11 @@ function SelectRowsForm({ rows, onSubmit }: SelectRowsFormProps) {
               currentPage.map((r) => (
                 <tr
                   key={r.id}
-                  style={{ ...(!r.enabled && { opacity: 0.5, pointerEvents: 'none' }) }}
+                  className={clsx({
+                    'pe-none': !r.matchedName,
+                    'opacity-25': !r.matchedName,
+                    'opacity-50': r.matchedName && !r.enabled,
+                  })}
                 >
                   <td>
                     <Controller
@@ -156,23 +170,58 @@ function SelectRowsForm({ rows, onSubmit }: SelectRowsFormProps) {
                       )}
                     />
                   </td>
-                  <td>{ r.name }</td>
+                  <td className={clsx({ 'p-0 lh-1': r.matchedName && r.matchedName !== r.name })}>
+                    <OverlayTrigger
+                      overlay={(
+                        <Tooltip>
+                          { i18n.t('injectedButton.modal.selectRowsForm.nameMatchedWarning') }
+                        </Tooltip>
+                      )}
+                      trigger={r.enabled ? [] : undefined}
+                      placement="left"
+                    >
+                      <span className={clsx(!!r.matchedName && !r.enabled && 'text-warning')}>
+                        { r.name }
+                      </span>
+                    </OverlayTrigger>
+                    {
+                      r.matchedName && r.matchedName !== r.name && (
+                        <>
+                          <br />
+                          <OverlayTrigger
+                            overlay={(
+                              <Tooltip>
+                                { i18n.t('injectedButton.modal.selectRowsForm.nameMatchedTooltip') }
+                              </Tooltip>
+                            )}
+                            placement="left"
+                          >
+                            <span className="text-light" style={{ fontSize: '0.75rem' }}>
+                              { r.matchedName }
+                            </span>
+                          </OverlayTrigger>
+                        </>
+                      )
+                    }
+                  </td>
                   {
-                    Object.entries(extraTableColumns).filter(([, v]) => !!v).map(([k]) => {
-                      const value = r[k];
-                      if (typeof value === 'boolean') return (
-                        <td key={k}>
-                          <span
-                            className={
-                              value
-                                ? 'fonticon-check-circle text-success'
-                                : 'fonticon-cross-circle text-danger'
-                            }
-                          />
-                        </td>
-                      );
-                      return (<td key={k}>{ String(value) }</td>);
-                    })
+                    Object.entries(gameManager.extraTableColumns)
+                      .filter(([, v]) => !!v)
+                      .map(([k]) => {
+                        const value = r[k];
+                        if (typeof value === 'boolean') return (
+                          <td key={k}>
+                            <span
+                              className={
+                                value
+                                  ? 'fonticon-check-circle text-success'
+                                  : 'fonticon-cross-circle text-danger'
+                              }
+                            />
+                          </td>
+                        );
+                        return (<td key={k}>{ String(value) }</td>);
+                      })
                   }
                   <td>{ r.quantity }</td>
                   <td>{ `${r.price.toFixed(2)}€` }</td>
@@ -181,13 +230,15 @@ function SelectRowsForm({ rows, onSubmit }: SelectRowsFormProps) {
             }
             {
               emptyArr.map((i) => (
-                <tr key={i} style={{ opacity: 0.8 }}>
+                <tr key={i} className="opacity-25 pe-none">
                   <td>&nbsp;</td>
                   <td>&nbsp;</td>
                   {
-                    Object.entries(extraTableColumns).filter(([, v]) => !!v).map(([k]) => (
-                      <td key={k}>&nbsp;</td>
-                    ))
+                    Object.entries(gameManager.extraTableColumns)
+                      .filter(([, v]) => !!v)
+                      .map(([k]) => (
+                        <td key={k}>&nbsp;</td>
+                      ))
                   }
                   <td>&nbsp;</td>
                   <td>&nbsp;</td>
@@ -216,15 +267,19 @@ function SelectRowsForm({ rows, onSubmit }: SelectRowsFormProps) {
               ? (
                   <Pagination className="m-0">
                     {
-                      indexArr.map((pNumber) => (
-                        <Pagination.Item
-                          key={pNumber}
-                          onClick={() => setPage(pNumber)}
-                          active={pNumber === pageNumber}
-                        >
-                          { pNumber }
-                        </Pagination.Item>
-                      ))
+                      indexArr.map((pNumber) => typeof pNumber === 'number'
+                        ? (
+                            <Pagination.Item
+                              key={pNumber}
+                              onClick={() => setPage(pNumber)}
+                              active={pNumber === pageNumber}
+                            >
+                              { pNumber }
+                            </Pagination.Item>
+                          )
+                        : (
+                            <Pagination.Ellipsis key={pNumber} disabled />
+                          ))
                     }
                   </Pagination>
                 )

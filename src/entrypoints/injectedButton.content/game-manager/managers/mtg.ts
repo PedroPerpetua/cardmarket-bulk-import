@@ -2,8 +2,10 @@ import memoize from 'memoize';
 import { sendMessage } from 'webext-bridge/content-script';
 import * as yup from 'yup';
 
-import type { GameManagerInterface } from '..';
+import GenericGameManager from './generic';
+import type { CommonParsedRowFields } from './generic';
 import { compareNormalized } from '../../../../utils';
+import type { TranslationKey } from '../../../../utils';
 import { readCsv } from '../../../../utils/csv';
 import { getWebsiteRows, priceElSelector, quantityElSelector } from '../utils';
 
@@ -26,26 +28,36 @@ const matchSetToCardmarketId = memoize(matchSetToCardmarketIdImpl);
 const VALID_FOIL_VALUES = ['t', '1', 'foil', 'yes'];
 const foilElSelector = 'td input[name^="isFoil"]';
 
-const MtgGameManager: GameManagerInterface<'set' | 'isFoil', { set: string, isFoil: boolean }> = {
-  extraColumns: {
+class MtgGameManager extends GenericGameManager<'set' | 'isFoil', { set: string, isFoil: boolean }> {
+  extraColumns: Record<'set' | 'isFoil', TranslationKey> = {
     set: 'injectedButton.gameManagers.mtg.importCsvForm.set.label',
     isFoil: 'injectedButton.gameManagers.mtg.importCsvForm.isFoil.label',
-  },
-  extraValidationSchema: yup.object({
+  };
+
+  extraValidationSchema = yup.object({
     set: yup.string(),
     isFoil: yup.string(),
-  }),
-  parseCsv: async (file, columnMapping) => {
+  });
+
+  async parseCsv(
+    file: File,
+    columnMapping: {
+      name: string,
+      quantity: string | undefined,
+      price: string | undefined,
+      set: string | undefined,
+      isFoil: string | undefined,
+    }) {
     const paramsCode = Number(new URLSearchParams(window.location.search).get('idExpansion'));
-
     const data = await readCsv(file);
-    const rows = [];
 
+    const rows = [];
     for (const [i, row] of data.rows.entries()) {
       const parsedName = String(row[columnMapping['name']]);
+      const matchedName = await this.matchName();
 
-      let enabled = !!getWebsiteRows().find((el) => compareNormalized(el.textContent, parsedName));
       let set = columnMapping['set'] ? String(row[columnMapping['set']]) : '';
+      let enabled = !!matchedName;
       if (set) {
         const data = await matchSetToCardmarketId(set);
         if (data) {
@@ -67,16 +79,20 @@ const MtgGameManager: GameManagerInterface<'set' | 'isFoil', { set: string, isFo
         quantity: columnMapping['quantity'] ? (Number(row[columnMapping['quantity']]) || 0) : 0,
         price: columnMapping['price'] ? (Number(row[columnMapping['price']]) || 0) : 0,
         enabled,
+        matchedName,
       });
     }
 
     return rows;
-  },
-  fillPage: (rows) => {
+  };
+
+  fillPage(rows: (CommonParsedRowFields & { set: string, isFoil: boolean })[]) {
     const websiteRows = getWebsiteRows();
     let count = 0;
     rows.forEach((row) => {
-      const nameEl = websiteRows.find((el) => compareNormalized(el.textContent, row.name));
+      const nameEl = websiteRows.find(
+        (el) => compareNormalized(el.textContent, row.matchedName ?? row.name),
+      );
       if (!nameEl) return;
       let trEl = nameEl.parentElement!.parentElement!.parentElement!;
       let quantityEl: HTMLInputElement = trEl.querySelector(quantityElSelector)!;
@@ -105,11 +121,12 @@ const MtgGameManager: GameManagerInterface<'set' | 'isFoil', { set: string, isFo
       count += 1;
     });
     return Promise.resolve(count);
-  },
-  extraTableColumns: {
+  };
+
+  extraTableColumns: Record<'set' | 'isFoil', TranslationKey> = {
     set: 'injectedButton.gameManagers.mtg.selectRowsFormTable.set',
     isFoil: 'injectedButton.gameManagers.mtg.selectRowsFormTable.isFoil',
-  },
+  };
 };
 
 export default MtgGameManager;

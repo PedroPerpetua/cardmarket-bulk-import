@@ -1,6 +1,30 @@
 # Changelog
 
 
+## [1.3.0] 2026-01-32
+
+### Changes
+- Added the ability to select disabled rows that still match the form.
+- Improved set matching with mtgjson; now `keyruneCode` is also considered.
+- Improved name-row matching: if there is not an row in the form with the exact name of the form, it'll look for an row that contains said name (normalized comparison)
+
+### Bugfixes
+- Large pagination on the SelectedRowsForm no longer breaks layout.
+- Sets without a cardmarket id will no longer be matched.
+
+### Housekeeping
+- Upgraded engines:
+  - `node`: `24.12.0` -> `24.13.0`.
+- Upgraded dependencies:
+  - `react-hook-form`: `7.68.0` -> `7.71.1`.
+  - `vite-plugin-node-polyfills`: `0.24.0` -> `0.25.0`.
+  - `@stylistic/eslint-plugin`: `5.6.1` -> `5.7.0`.
+  - `@types/react`: `19.2.7` ->  `19.2.9`.
+  - `eslint-plugin-react-refresh`: `0.4.25` ->  `0.4.26`.
+  - `typescript-eslint`: `8.49.0` ->  `8.53.1`.
+  - `wxt`: `0.20.11` ->  `0.20.13`.
+
+
 ## [1.2.0] 2025-12-15
 
 ### Changes
