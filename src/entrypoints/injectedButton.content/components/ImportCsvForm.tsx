@@ -35,7 +35,7 @@ type ImportCsvFormProps = {
 };
 
 function ImportCsvForm({ onSubmit }: ImportCsvFormProps) {
-  const { extraColumns, extraValidationSchema, parseCsv } = useGameManager();
+  const gameManager = useGameManager();
   const [{ value: csvColumns, loading, error }, getColumns] = useAsyncFn(getCsvColumns);
   const {
     control,
@@ -47,13 +47,13 @@ function ImportCsvForm({ onSubmit }: ImportCsvFormProps) {
     formState: { errors: formErrors, touchedFields },
   } = useForm<ImportFormValues, undefined, ImportFormValues>({
     // @ts-ignore // yup doesn't like the concat here
-    resolver: yupResolver(baseValidationSchema.concat(extraValidationSchema)),
+    resolver: yupResolver(baseValidationSchema.concat(gameManager.extraValidationSchema)),
   });
 
   const submitFn = handleSubmit(async (data) => {
     const { files, ...mapping } = data;
     try {
-      const res = await parseCsv(files[0], mapping);
+      const res = await gameManager.parseCsv(files[0], mapping);
       onSubmit(res);
     }
     catch (e) {
@@ -91,7 +91,7 @@ function ImportCsvForm({ onSubmit }: ImportCsvFormProps) {
         options={csvColumns}
       />
       {
-        Object.entries(extraColumns).map(([name, label]) => (
+        Object.entries(gameManager.extraColumns).map(([name, label]) => (
           <ColumnSelect
             key={name}
             control={control}

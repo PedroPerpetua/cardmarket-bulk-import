@@ -14,14 +14,14 @@ function App() {
   const [show, setShow] = useState(false);
   const [importedRows, setImportedRows] = useState<ParsedRow[] | null>(null);
   const [filledCount, setFilledCount] = useState<number | null>(null);
-  const { fillPage } = useGameManager();
+  const gameManager = useGameManager();
 
   let content = (<ImportCsvForm onSubmit={(res) => setImportedRows(res)} />);
   if (importedRows !== null) content = (
     <SelectRowsForm
       rows={importedRows}
       onSubmit={(rows) => {
-        fillPage(rows).then((filled) => {
+        gameManager.fillPage(rows).then((filled) => {
           setShow(false);
           setFilledCount(filled);
         });

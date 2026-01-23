@@ -29,7 +29,7 @@ type SelectRowsFormProps = {
 };
 
 function SelectRowsForm({ rows, onSubmit }: SelectRowsFormProps) {
-  const { extraTableColumns } = useGameManager();
+  const gameManager = useGameManager();
   const [showDisabled, setShowDisabled] = useState(false);
   const enabledRows = useMemo(() => rows.filter((r) => r.enabled), [rows]);
 
@@ -122,7 +122,7 @@ function SelectRowsForm({ rows, onSubmit }: SelectRowsFormProps) {
                 { i18n.t('injectedButton.gameManagers.common.selectRowsFormTable.name') }
               </th>
               {
-                Object.entries(extraTableColumns).map(([key, value]) => {
+                Object.entries(gameManager.extraTableColumns).map(([key, value]) => {
                   if (!value) return null;
                   if (typeof value === 'string') return (
                     <th key={key} className="col-md-1">
@@ -150,9 +150,9 @@ function SelectRowsForm({ rows, onSubmit }: SelectRowsFormProps) {
                 <tr
                   key={r.id}
                   className={clsx({
-                    'pe-none': !r.nameMatched,
-                    'opacity-25': !r.nameMatched,
-                    'opacity-50': r.nameMatched && !r.enabled,
+                    'pe-none': !r.matchedName,
+                    'opacity-25': !r.matchedName,
+                    'opacity-50': r.matchedName && !r.enabled,
                   })}
                 >
                   <td>
@@ -170,7 +170,7 @@ function SelectRowsForm({ rows, onSubmit }: SelectRowsFormProps) {
                       )}
                     />
                   </td>
-                  <td>
+                  <td className={clsx({ 'p-0 lh-1': r.matchedName && r.matchedName !== r.name })}>
                     <OverlayTrigger
                       overlay={(
                         <Tooltip>
@@ -180,27 +180,48 @@ function SelectRowsForm({ rows, onSubmit }: SelectRowsFormProps) {
                       trigger={r.enabled ? [] : undefined}
                       placement="left"
                     >
-                      <span className={clsx(r.nameMatched && !r.enabled && 'text-warning')}>
+                      <span className={clsx(!!r.matchedName && !r.enabled && 'text-warning')}>
                         { r.name }
                       </span>
                     </OverlayTrigger>
+                    {
+                      r.matchedName && r.matchedName !== r.name && (
+                        <>
+                          <br />
+                          <OverlayTrigger
+                            overlay={(
+                              <Tooltip>
+                                { i18n.t('injectedButton.modal.selectRowsForm.nameMatchedTooltip') }
+                              </Tooltip>
+                            )}
+                            placement="left"
+                          >
+                            <span className="text-light" style={{ fontSize: '0.75rem' }}>
+                              { r.matchedName }
+                            </span>
+                          </OverlayTrigger>
+                        </>
+                      )
+                    }
                   </td>
                   {
-                    Object.entries(extraTableColumns).filter(([, v]) => !!v).map(([k]) => {
-                      const value = r[k];
-                      if (typeof value === 'boolean') return (
-                        <td key={k}>
-                          <span
-                            className={
-                              value
-                                ? 'fonticon-check-circle text-success'
-                                : 'fonticon-cross-circle text-danger'
-                            }
-                          />
-                        </td>
-                      );
-                      return (<td key={k}>{ String(value) }</td>);
-                    })
+                    Object.entries(gameManager.extraTableColumns)
+                      .filter(([, v]) => !!v)
+                      .map(([k]) => {
+                        const value = r[k];
+                        if (typeof value === 'boolean') return (
+                          <td key={k}>
+                            <span
+                              className={
+                                value
+                                  ? 'fonticon-check-circle text-success'
+                                  : 'fonticon-cross-circle text-danger'
+                              }
+                            />
+                          </td>
+                        );
+                        return (<td key={k}>{ String(value) }</td>);
+                      })
                   }
                   <td>{ r.quantity }</td>
                   <td>{ `${r.price.toFixed(2)}€` }</td>
@@ -213,9 +234,11 @@ function SelectRowsForm({ rows, onSubmit }: SelectRowsFormProps) {
                   <td>&nbsp;</td>
                   <td>&nbsp;</td>
                   {
-                    Object.entries(extraTableColumns).filter(([, v]) => !!v).map(([k]) => (
-                      <td key={k}>&nbsp;</td>
-                    ))
+                    Object.entries(gameManager.extraTableColumns)
+                      .filter(([, v]) => !!v)
+                      .map(([k]) => (
+                        <td key={k}>&nbsp;</td>
+                      ))
                   }
                   <td>&nbsp;</td>
                   <td>&nbsp;</td>
