@@ -1,12 +1,18 @@
 # Changelog
 
 
+## Unreleased
+
+### Bugfixes
+- Fixed item name not matching correctly in MTG.
+
+
 ## [1.3.0] 2026-01-32
 
 ### Changes
 - Added the ability to select disabled rows that still match the form.
 - Improved set matching with mtgjson; now `keyruneCode` is also considered.
-- Improved name-row matching: if there is not an row in the form with the exact name of the form, it'll look for an row that contains said name (normalized comparison)
+- Improved name-row matching: if there is not an row in the form with the exact name of the form, it'll look for an row that contains said name (normalized comparison).
 
 ### Bugfixes
 - Large pagination on the SelectedRowsForm no longer breaks layout.
