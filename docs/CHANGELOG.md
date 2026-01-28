@@ -1,7 +1,7 @@
 # Changelog
 
 
-## Unreleased
+## [1.3.1] 2026-01-28
 
 ### Bugfixes
 - Fixed item name not matching correctly in MTG.
