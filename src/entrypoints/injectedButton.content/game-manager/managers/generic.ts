@@ -61,8 +61,9 @@ class GenericGameManager<
    * @param args List of string arguments to use to match the name.
    * @returns The matched name on the form, or null if none was matched.
    */
-  matchName(...args: string[]): Promise<string | null> {
-    const parsedName = args[0];
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  matchName(arg0: string, ...args: string[]): Promise<string | null> {
+    const parsedName = arg0;
     const mappedNames = getWebsiteRows().map((el) => el.textContent);
     let matchedName = null;
     for (const name of mappedNames) {

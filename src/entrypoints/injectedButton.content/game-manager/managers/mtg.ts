@@ -54,7 +54,7 @@ class MtgGameManager extends GenericGameManager<'set' | 'isFoil', { set: string,
     const rows = [];
     for (const [i, row] of data.rows.entries()) {
       const parsedName = String(row[columnMapping['name']]);
-      const matchedName = await this.matchName();
+      const matchedName = await this.matchName(parsedName);
 
       let set = columnMapping['set'] ? String(row[columnMapping['set']]) : '';
       let enabled = !!matchedName;

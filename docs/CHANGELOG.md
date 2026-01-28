@@ -1,12 +1,26 @@
 # Changelog
 
 
+## [1.3.1] 2026-01-28
+
+### Bugfixes
+- Fixed item name not matching correctly in MTG.
+
+### Housekeeping
+- Upgraded dependencies:
+  - `react`: `19.2.3` -> `19.2.4`.
+  - `react-dom`: `19.2.3` -> `19.2.4`.
+  - `@stylistic/eslint-plugin`: `5.7.0` -> `5.7.1`.
+  - `@types/react`: `19.2.9` -> `19.2.10`.
+  - `"typescript-eslint`: `8.53.1` -> `8.54.0`.
+
+
 ## [1.3.0] 2026-01-32
 
 ### Changes
 - Added the ability to select disabled rows that still match the form.
 - Improved set matching with mtgjson; now `keyruneCode` is also considered.
-- Improved name-row matching: if there is not an row in the form with the exact name of the form, it'll look for an row that contains said name (normalized comparison)
+- Improved name-row matching: if there is not an row in the form with the exact name of the form, it'll look for an row that contains said name (normalized comparison).
 
 ### Bugfixes
 - Large pagination on the SelectedRowsForm no longer breaks layout.
