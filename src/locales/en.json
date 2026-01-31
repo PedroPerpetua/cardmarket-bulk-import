@@ -76,13 +76,17 @@
                     },
                     "price": {
                         "label": "Price Column"
+                    },
+                    "language": {
+                        "label": "Language Column"
                     }
                 },
                 "selectRowsFormTable": {
                     "check": "Fill",
                     "name": "Name",
                     "quantity": "Quantity",
-                    "price": "Price"
+                    "price": "Price",
+                    "language": "Language"
                 }
             },
             "mtg": {

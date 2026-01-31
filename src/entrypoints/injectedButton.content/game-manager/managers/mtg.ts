@@ -4,10 +4,16 @@ import * as yup from 'yup';
 
 import GenericGameManager from './generic';
 import type { CommonParsedRowFields } from './generic';
-import { compareNormalized } from '../../../../utils';
+import { compareNormalized, normalizeString } from '../../../../utils';
 import type { TranslationKey } from '../../../../utils';
 import { readCsv } from '../../../../utils/csv';
-import { getWebsiteRows, priceElSelector, quantityElSelector } from '../utils';
+import {
+  getWebsiteRows,
+  languageCodeMap,
+  languageElSelector,
+  priceElSelector,
+  quantityElSelector,
+} from '../utils';
 
 async function getMTGJSONDataImpl() {
   // We can't fetch inside the content script, so we delegate to the background with messages
@@ -45,6 +51,7 @@ class MtgGameManager extends GenericGameManager<'set' | 'isFoil', { set: string,
       name: string,
       quantity: string | undefined,
       price: string | undefined,
+      language: string | undefined,
       set: string | undefined,
       isFoil: string | undefined,
     }) {
@@ -78,6 +85,7 @@ class MtgGameManager extends GenericGameManager<'set' | 'isFoil', { set: string,
           : false,
         quantity: columnMapping['quantity'] ? (Number(row[columnMapping['quantity']]) || 0) : 0,
         price: columnMapping['price'] ? (Number(row[columnMapping['price']]) || 0) : 0,
+        language: columnMapping['language'] ? String(row[columnMapping['language']]) : '',
         enabled,
         matchedName,
       });
@@ -98,6 +106,7 @@ class MtgGameManager extends GenericGameManager<'set' | 'isFoil', { set: string,
       let quantityEl: HTMLInputElement = trEl.querySelector(quantityElSelector)!;
       let foilEl: HTMLInputElement = trEl.querySelector(foilElSelector)!;
       let priceEl: HTMLInputElement = trEl.querySelector(priceElSelector)!;
+      let languageEl: HTMLSelectElement = trEl.querySelector(languageElSelector)!;
 
       // Check if there's already quantity on this row... if so, we may need to create a new one
       // This covers the foils + non foil rows
@@ -112,12 +121,40 @@ class MtgGameManager extends GenericGameManager<'set' | 'isFoil', { set: string,
         foilEl.checked = foilEl.defaultChecked;
         priceEl = trEl.querySelector(priceElSelector)!;
         priceEl.value = priceEl.defaultValue;
+        languageEl = trEl.querySelector(languageElSelector)!;
+        languageEl.value = languageEl.options[0]?.value ?? '';
       }
 
       // Now input the data
       if (row.quantity) quantityEl.value = row.quantity.toString();
       if (row.isFoil) foilEl.checked = true;
       if (row.price) priceEl.value = row.price.toFixed(2);
+      if (row.language) {
+        // Try to match language by option text or value
+        const options = Array.from(languageEl.options);
+        const normalizedLang = normalizeString(row.language);
+        
+        // First try direct match
+        let matchedOption = options.find(
+          (opt) => compareNormalized(opt.text, row.language) || compareNormalized(opt.value, row.language),
+        );
+        
+        // If no match and looks like language code, try mapping
+        if (!matchedOption && normalizedLang.length <= 3) {
+          const possibleNames = languageCodeMap[normalizedLang.toLowerCase()];
+          if (possibleNames) {
+            matchedOption = options.find((opt) => 
+              possibleNames.some((name) => compareNormalized(opt.text, name)),
+            );
+          }
+        }
+        
+        if (matchedOption) {
+          languageEl.value = matchedOption.value;
+        } else {
+          console.warn(`[cardmarket-bulk-import] Could not match language: "${row.language}"`);
+        }
+      }
       count += 1;
     });
     return Promise.resolve(count);
