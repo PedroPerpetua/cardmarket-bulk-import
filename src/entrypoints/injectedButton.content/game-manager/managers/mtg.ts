@@ -133,26 +133,24 @@ class MtgGameManager extends GenericGameManager<'set' | 'isFoil', { set: string,
         // Try to match language by option text or value
         const options = Array.from(languageEl.options);
         const normalizedLang = normalizeString(row.language);
-        
+
         // First try direct match
         let matchedOption = options.find(
           (opt) => compareNormalized(opt.text, row.language) || compareNormalized(opt.value, row.language),
         );
-        
+
         // If no match and looks like language code, try mapping
         if (!matchedOption && normalizedLang.length <= 3) {
           const possibleNames = languageCodeMap[normalizedLang.toLowerCase()];
           if (possibleNames) {
-            matchedOption = options.find((opt) => 
+            matchedOption = options.find((opt) =>
               possibleNames.some((name) => compareNormalized(opt.text, name)),
             );
           }
         }
-        
+
         if (matchedOption) {
           languageEl.value = matchedOption.value;
-        } else {
-          console.warn(`[cardmarket-bulk-import] Could not match language: "${row.language}"`);
         }
       }
       count += 1;
