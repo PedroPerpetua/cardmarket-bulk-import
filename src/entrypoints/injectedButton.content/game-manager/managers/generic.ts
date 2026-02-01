@@ -5,7 +5,7 @@ import type { TranslationKey } from '../../../../utils';
 import { readCsv } from '../../../../utils/csv';
 import {
   getWebsiteRows,
-  languageCodeMap,
+  matchLanguageOption,
   languageElSelector,
   priceElSelector,
   quantityElSelector,
@@ -116,27 +116,9 @@ class GenericGameManager<
       let matchedLanguage = '';
       if (columnMapping['language']) {
         const rawLanguage = String(row[columnMapping['language']]);
-        if (rawLanguage && availableLanguageOptions.length > 0) {
-          const normalizedLang = normalizeString(rawLanguage);
-
-          // First try direct match
-          let matchedOption = availableLanguageOptions.find(
-            (opt) => compareNormalized(opt.text, rawLanguage) || compareNormalized(opt.value, rawLanguage),
-          );
-
-          // If no match, try mapping
-          if (!matchedOption) {
-            const possibleNames = languageCodeMap[normalizedLang.toLowerCase()];
-            if (possibleNames) {
-              matchedOption = availableLanguageOptions.find((opt) =>
-                possibleNames.some((name) => compareNormalized(opt.text, name)),
-              );
-            }
-          }
-
-          if (matchedOption) {
-            matchedLanguage = matchedOption.value;
-          }
+        const matchedOption = matchLanguageOption(rawLanguage, availableLanguageOptions);
+        if (matchedOption) {
+          matchedLanguage = matchedOption.value;
         }
       }
 

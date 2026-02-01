@@ -4,12 +4,12 @@ import * as yup from 'yup';
 
 import GenericGameManager from './generic';
 import type { CommonParsedRowFields } from './generic';
-import { compareNormalized, normalizeString } from '../../../../utils';
+import { compareNormalized } from '../../../../utils';
 import type { TranslationKey } from '../../../../utils';
 import { readCsv } from '../../../../utils/csv';
 import {
   getWebsiteRows,
-  languageCodeMap,
+  matchLanguageOption,
   languageElSelector,
   priceElSelector,
   quantityElSelector,
@@ -87,28 +87,10 @@ class MtgGameManager extends GenericGameManager<'set' | 'isFoil', { set: string,
       let matchedLanguageDisplay = '';
       if (columnMapping['language']) {
         const rawLanguage = String(row[columnMapping['language']]);
-        if (rawLanguage && availableLanguageOptions.length > 0) {
-          const normalizedLang = normalizeString(rawLanguage);
-
-          // First try direct match
-          let matchedOption = availableLanguageOptions.find(
-            (opt) => compareNormalized(opt.text, rawLanguage) || compareNormalized(opt.value, rawLanguage),
-          );
-
-          // If no match, try mapping
-          if (!matchedOption) {
-            const possibleNames = languageCodeMap[normalizedLang.toLowerCase()];
-            if (possibleNames) {
-              matchedOption = availableLanguageOptions.find((opt) =>
-                possibleNames.some((name) => compareNormalized(opt.text, name)),
-              );
-            }
-          }
-
-          if (matchedOption) {
-            matchedLanguage = matchedOption.value;
-            matchedLanguageDisplay = matchedOption.text;
-          }
+        const matchedOption = matchLanguageOption(rawLanguage, availableLanguageOptions);
+        if (matchedOption) {
+          matchedLanguage = matchedOption.value;
+          matchedLanguageDisplay = matchedOption.text;
         }
       }
 
