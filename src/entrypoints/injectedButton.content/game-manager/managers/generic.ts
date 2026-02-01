@@ -102,17 +102,50 @@ class GenericGameManager<
   ): Promise<(CommonParsedRowFields & ExtraParsedRowFields)[]> {
     const data = await readCsv(file);
 
+    // Get available language options from the page once
+    const websiteRows = getWebsiteRows();
+    const firstRow = websiteRows[0]?.parentElement?.parentElement?.parentElement;
+    const languageEl: HTMLSelectElement | null = firstRow?.querySelector(languageElSelector) ?? null;
+    const availableLanguageOptions = languageEl ? Array.from(languageEl.options) : [];
+
     const rows = [];
     for (const [i, row] of data.rows.entries()) {
       const parsedName = String(row[columnMapping['name']]);
       const matchedName = await this.matchName(parsedName);
+
+      let matchedLanguage = '';
+      if (columnMapping['language']) {
+        const rawLanguage = String(row[columnMapping['language']]);
+        if (rawLanguage && availableLanguageOptions.length > 0) {
+          const normalizedLang = normalizeString(rawLanguage);
+
+          // First try direct match
+          let matchedOption = availableLanguageOptions.find(
+            (opt) => compareNormalized(opt.text, rawLanguage) || compareNormalized(opt.value, rawLanguage),
+          );
+
+          // If no match, try mapping
+          if (!matchedOption) {
+            const possibleNames = languageCodeMap[normalizedLang.toLowerCase()];
+            if (possibleNames) {
+              matchedOption = availableLanguageOptions.find((opt) =>
+                possibleNames.some((name) => compareNormalized(opt.text, name)),
+              );
+            }
+          }
+
+          if (matchedOption) {
+            matchedLanguage = matchedOption.value;
+          }
+        }
+      }
 
       rows.push({
         id: i,
         name: parsedName,
         quantity: columnMapping['quantity'] ? (Number(row[columnMapping['quantity']]) || 0) : 0,
         price: columnMapping['price'] ? (Number(row[columnMapping['price']]) || 0) : 0,
-        language: columnMapping['language'] ? String(row[columnMapping['language']]) : '',
+        language: matchedLanguage,
         enabled: !!matchedName,
         matchedName,
       });
@@ -157,33 +190,7 @@ class GenericGameManager<
       // Now input the data
       if (row.quantity) quantityEl.value = row.quantity.toString();
       if (row.price) priceEl.value = row.price.toFixed(2);
-      if (row.language) {
-        // Try to match language by option text or value
-        const options = Array.from(languageEl.options);
-        const normalizedLang = normalizeString(row.language);
-
-        // First try direct match
-        let matchedOption = options.find(
-          (opt) => compareNormalized(opt.text, row.language) || compareNormalized(opt.value, row.language),
-        );
-
-        // If no match, try mapping
-        if (!matchedOption) {
-          const possibleNames = languageCodeMap[normalizedLang.toLowerCase()];
-          if (possibleNames) {
-            matchedOption = options.find((opt) =>
-              possibleNames.some((name) => compareNormalized(opt.text, name)),
-            );
-          }
-        }
-
-        if (matchedOption) {
-          languageEl.value = matchedOption.value;
-        }
-        else {
-          console.warn(`[cardmarket-bulk-import] Could not match language: "${row.language}"`);
-        }
-      }
+      if (row.language) languageEl.value = row.language;
       count += 1;
     });
     return Promise.resolve(count);
