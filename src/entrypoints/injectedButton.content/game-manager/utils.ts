@@ -42,13 +42,13 @@ export function matchLanguageOption(
   availableOptions: HTMLOptionElement[],
 ): HTMLOptionElement | null {
   if (!languageInput || availableOptions.length === 0) return null;
-  
+
   // Try direct match first
   const directMatch = availableOptions.find(
     (opt) => compareNormalized(opt.text, languageInput) || compareNormalized(opt.value, languageInput),
   );
   if (directMatch) return directMatch;
-  
+
   // Try language code mapping
   const normalizedInput = normalizeString(languageInput).toLowerCase();
   const possibleNames = languageNameMap[normalizedInput];
@@ -57,8 +57,6 @@ export function matchLanguageOption(
       possibleNames.some((name) => compareNormalized(opt.text, name)),
     ) ?? null;
   }
-  
+
   return null;
 }
-
-
