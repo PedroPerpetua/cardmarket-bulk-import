@@ -17,6 +17,7 @@ type BaseImportFormValues = {
   name: string,
   quantity: string | undefined,
   price: string | undefined,
+  language: string | undefined,
 };
 
 const baseValidationSchema: yup.ObjectSchema<BaseImportFormValues> = yup.object({
@@ -26,6 +27,7 @@ const baseValidationSchema: yup.ObjectSchema<BaseImportFormValues> = yup.object(
     .required(i18n.t('injectedButton.gameManagers.common.importCsvForm.name.required')),
   quantity: yup.string(),
   price: yup.string(),
+  language: yup.string(),
 });
 
 type ImportFormValues = BaseImportFormValues & Record<string, string | undefined>;
@@ -114,6 +116,13 @@ function ImportCsvForm({ onSubmit }: ImportCsvFormProps) {
         formId="importCsvForm.price"
         name="price"
         label={i18n.t('injectedButton.gameManagers.common.importCsvForm.price.label')}
+        options={csvColumns}
+      />
+      <ColumnSelect
+        control={control}
+        formId="importCsvForm.language"
+        name="language"
+        label={i18n.t('injectedButton.gameManagers.common.importCsvForm.language.label')}
         options={csvColumns}
       />
       <Button type="submit" className="mx-auto">

@@ -142,6 +142,9 @@ function SelectRowsForm({ rows, onSubmit }: SelectRowsFormProps) {
               <th className="col-md-1">
                 { i18n.t('injectedButton.gameManagers.common.selectRowsFormTable.price') }
               </th>
+              <th className="col-md-1">
+                { i18n.t('injectedButton.gameManagers.common.selectRowsFormTable.language') }
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -225,6 +228,7 @@ function SelectRowsForm({ rows, onSubmit }: SelectRowsFormProps) {
                   }
                   <td>{ r.quantity }</td>
                   <td>{ `${r.price.toFixed(2)}€` }</td>
+                  <td>{ r.language }</td>
                 </tr>
               ))
             }
@@ -240,6 +244,7 @@ function SelectRowsForm({ rows, onSubmit }: SelectRowsFormProps) {
                         <td key={k}>&nbsp;</td>
                       ))
                   }
+                  <td>&nbsp;</td>
                   <td>&nbsp;</td>
                   <td>&nbsp;</td>
                 </tr>
