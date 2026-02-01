@@ -95,8 +95,8 @@ class MtgGameManager extends GenericGameManager<'set' | 'isFoil', { set: string,
             (opt) => compareNormalized(opt.text, rawLanguage) || compareNormalized(opt.value, rawLanguage),
           );
 
-          // If no match and looks like language code, try mapping
-          if (!matchedOption && normalizedLang.length <= 3) {
+          // If no match, try mapping
+          if (!matchedOption) {
             const possibleNames = languageCodeMap[normalizedLang.toLowerCase()];
             if (possibleNames) {
               matchedOption = availableLanguageOptions.find((opt) =>

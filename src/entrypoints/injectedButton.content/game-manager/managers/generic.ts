@@ -167,8 +167,8 @@ class GenericGameManager<
           (opt) => compareNormalized(opt.text, row.language) || compareNormalized(opt.value, row.language),
         );
 
-        // If no match and looks like language code, try mapping
-        if (!matchedOption && normalizedLang.length <= 3) {
+        // If no match, try mapping
+        if (!matchedOption) {
           const possibleNames = languageCodeMap[normalizedLang.toLowerCase()];
           if (possibleNames) {
             matchedOption = options.find((opt) =>
