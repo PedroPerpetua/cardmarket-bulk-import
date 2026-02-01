@@ -58,6 +58,12 @@ class MtgGameManager extends GenericGameManager<'set' | 'isFoil', { set: string,
     const paramsCode = Number(new URLSearchParams(window.location.search).get('idExpansion'));
     const data = await readCsv(file);
 
+    // Get available language options from the page once
+    const websiteRows = getWebsiteRows();
+    const firstRow = websiteRows[0]?.parentElement?.parentElement?.parentElement;
+    const languageEl: HTMLSelectElement | null = firstRow?.querySelector(languageElSelector) ?? null;
+    const availableLanguageOptions = languageEl ? Array.from(languageEl.options) : [];
+
     const rows = [];
     for (const [i, row] of data.rows.entries()) {
       const parsedName = String(row[columnMapping['name']]);
@@ -76,6 +82,36 @@ class MtgGameManager extends GenericGameManager<'set' | 'isFoil', { set: string,
         }
       }
 
+      // Match language during parsing
+      let matchedLanguage = '';
+      let matchedLanguageDisplay = '';
+      if (columnMapping['language']) {
+        const rawLanguage = String(row[columnMapping['language']]);
+        if (rawLanguage && availableLanguageOptions.length > 0) {
+          const normalizedLang = normalizeString(rawLanguage);
+
+          // First try direct match
+          let matchedOption = availableLanguageOptions.find(
+            (opt) => compareNormalized(opt.text, rawLanguage) || compareNormalized(opt.value, rawLanguage),
+          );
+
+          // If no match and looks like language code, try mapping
+          if (!matchedOption && normalizedLang.length <= 3) {
+            const possibleNames = languageCodeMap[normalizedLang.toLowerCase()];
+            if (possibleNames) {
+              matchedOption = availableLanguageOptions.find((opt) =>
+                possibleNames.some((name) => compareNormalized(opt.text, name)),
+              );
+            }
+          }
+
+          if (matchedOption) {
+            matchedLanguage = matchedOption.value;
+            matchedLanguageDisplay = matchedOption.text;
+          }
+        }
+      }
+
       rows.push({
         id: i,
         name: parsedName,
@@ -85,16 +121,17 @@ class MtgGameManager extends GenericGameManager<'set' | 'isFoil', { set: string,
           : false,
         quantity: columnMapping['quantity'] ? (Number(row[columnMapping['quantity']]) || 0) : 0,
         price: columnMapping['price'] ? (Number(row[columnMapping['price']]) || 0) : 0,
-        language: columnMapping['language'] ? String(row[columnMapping['language']]) : '',
+        language: matchedLanguageDisplay,
         enabled,
         matchedName,
+        languageValue: matchedLanguage,
       });
     }
 
     return rows;
   };
 
-  fillPage(rows: (CommonParsedRowFields & { set: string, isFoil: boolean })[]) {
+  fillPage(rows: (CommonParsedRowFields & { set: string, isFoil: boolean, languageValue: string })[]) {
     const websiteRows = getWebsiteRows();
     let count = 0;
     rows.forEach((row) => {
@@ -129,30 +166,7 @@ class MtgGameManager extends GenericGameManager<'set' | 'isFoil', { set: string,
       if (row.quantity) quantityEl.value = row.quantity.toString();
       if (row.isFoil) foilEl.checked = true;
       if (row.price) priceEl.value = row.price.toFixed(2);
-      if (row.language) {
-        // Try to match language by option text or value
-        const options = Array.from(languageEl.options);
-        const normalizedLang = normalizeString(row.language);
-
-        // First try direct match
-        let matchedOption = options.find(
-          (opt) => compareNormalized(opt.text, row.language) || compareNormalized(opt.value, row.language),
-        );
-
-        // If no match and looks like language code, try mapping
-        if (!matchedOption && normalizedLang.length <= 3) {
-          const possibleNames = languageCodeMap[normalizedLang.toLowerCase()];
-          if (possibleNames) {
-            matchedOption = options.find((opt) =>
-              possibleNames.some((name) => compareNormalized(opt.text, name)),
-            );
-          }
-        }
-
-        if (matchedOption) {
-          languageEl.value = matchedOption.value;
-        }
-      }
+      if (row.languageValue) languageEl.value = row.languageValue;
       count += 1;
     });
     return Promise.resolve(count);
