@@ -7,6 +7,11 @@
 - Added language support.
   - Thank you [@danimp94](https://github.com/danimp94)!
 
+### Housekeeping
+- Upgraded dependencies:
+  - `@types/react`: `19.2.10` -> `19.2.11`.
+  - `eslint-plugin-react-refresh`: `0.4.26` -> `0.5.0`.
+
 
 ## [1.3.1] 2026-01-28
 
@@ -19,7 +24,7 @@
   - `react-dom`: `19.2.3` -> `19.2.4`.
   - `@stylistic/eslint-plugin`: `5.7.0` -> `5.7.1`.
   - `@types/react`: `19.2.9` -> `19.2.10`.
-  - `"typescript-eslint`: `8.53.1` -> `8.54.0`.
+  - `typescript-eslint`: `8.53.1` -> `8.54.0`.
 
 
 ## [1.3.0] 2026-01-32

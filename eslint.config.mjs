@@ -3,7 +3,7 @@ import stylistic from '@stylistic/eslint-plugin';
 import importPlugin from 'eslint-plugin-import';
 import react from 'eslint-plugin-react';
 import reactHooks from 'eslint-plugin-react-hooks';
-import reactRefresh from 'eslint-plugin-react-refresh';
+import { reactRefresh } from 'eslint-plugin-react-refresh';
 import globals from 'globals';
 import tseslint from 'typescript-eslint';
 
@@ -43,11 +43,11 @@ export default tseslint.config(
       importPlugin.flatConfigs.recommended,
       react.configs.flat.recommended,
       react.configs.flat['jsx-runtime'],
+      reactRefresh.configs.vite(),
     ],
     plugins: {
       '@stylistic': stylistic,
       'react-hooks': reactHooks,
-      'react-refresh': reactRefresh,
     },
     rules: {
       /* base rules */
