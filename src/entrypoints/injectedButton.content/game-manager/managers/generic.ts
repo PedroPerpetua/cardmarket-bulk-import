@@ -3,13 +3,20 @@ import * as yup from 'yup';
 import { compareNormalized, normalizeString } from '../../../../utils';
 import type { TranslationKey } from '../../../../utils';
 import { readCsv } from '../../../../utils/csv';
-import { getWebsiteRows, priceElSelector, quantityElSelector } from '../utils';
+import {
+  getWebsiteRows,
+  matchLanguageOption,
+  languageElSelector,
+  priceElSelector,
+  quantityElSelector,
+} from '../utils';
 
 export type CommonParsedRowFields = {
   id: number,
   name: string,
   quantity: number,
   price: number,
+  language: string,
   enabled: boolean,
   matchedName: string | null,
 };
@@ -23,10 +30,10 @@ export type CommonParsedRowFields = {
  * This GenericGameManager has the base functionality that can be used generically for any game.
  *
  * All managers have to, by default, take an input column for the article name, and optional inputs
- * for price and quantity. They can define any extra columns they wish to parse.
+ * for price, quantity, and language. They can define any extra columns they wish to parse.
  *
  * All managers will have their own internal ParsedRow type, that must include at least, id, name,
- * quantity, price, enabled and matchedName. They can parse and display any extra fields, but these
+ * quantity, price, language, enabled and matchedName. They can parse and display any extra fields, but these
  * fields are required.
  */
 class GenericGameManager<
@@ -90,20 +97,37 @@ class GenericGameManager<
       name: string,
       quantity: string | undefined,
       price: string | undefined,
+      language: string | undefined,
     } & Record<ExtraColumnInputs, string | undefined>),
   ): Promise<(CommonParsedRowFields & ExtraParsedRowFields)[]> {
     const data = await readCsv(file);
+
+    // Get available language options from the page once
+    const websiteRows = getWebsiteRows();
+    const firstRow = websiteRows[0]?.parentElement?.parentElement?.parentElement;
+    const languageEl: HTMLSelectElement | null = firstRow?.querySelector(languageElSelector) ?? null;
+    const availableLanguageOptions = languageEl ? Array.from(languageEl.options) : [];
 
     const rows = [];
     for (const [i, row] of data.rows.entries()) {
       const parsedName = String(row[columnMapping['name']]);
       const matchedName = await this.matchName(parsedName);
 
+      let matchedLanguage = '';
+      if (columnMapping['language']) {
+        const rawLanguage = String(row[columnMapping['language']]);
+        const matchedOption = matchLanguageOption(rawLanguage, availableLanguageOptions);
+        if (matchedOption) {
+          matchedLanguage = matchedOption.value;
+        }
+      }
+
       rows.push({
         id: i,
         name: parsedName,
         quantity: columnMapping['quantity'] ? (Number(row[columnMapping['quantity']]) || 0) : 0,
         price: columnMapping['price'] ? (Number(row[columnMapping['price']]) || 0) : 0,
+        language: matchedLanguage,
         enabled: !!matchedName,
         matchedName,
       });
@@ -130,6 +154,7 @@ class GenericGameManager<
       let trEl = nameEl.parentElement!.parentElement!.parentElement!;
       let quantityEl: HTMLInputElement = trEl.querySelector(quantityElSelector)!;
       let priceEl: HTMLInputElement = trEl.querySelector(priceElSelector)!;
+      let languageEl: HTMLSelectElement = trEl.querySelector(languageElSelector)!;
 
       // Check if there's already quantity on this row... if so, we may need to create a new one
       if (quantityEl.value && quantityEl.value !== '0') {
@@ -141,10 +166,13 @@ class GenericGameManager<
         quantityEl.value = quantityEl.defaultValue;
         priceEl = trEl.querySelector(priceElSelector)!;
         priceEl.value = priceEl.defaultValue;
+        languageEl = trEl.querySelector(languageElSelector)!;
+        languageEl.value = languageEl.options[0]?.value ?? '';
       }
       // Now input the data
       if (row.quantity) quantityEl.value = row.quantity.toString();
       if (row.price) priceEl.value = row.price.toFixed(2);
+      if (row.language) languageEl.value = row.language;
       count += 1;
     });
     return Promise.resolve(count);

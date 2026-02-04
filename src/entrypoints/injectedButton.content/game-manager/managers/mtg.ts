@@ -7,7 +7,13 @@ import type { CommonParsedRowFields } from './generic';
 import { compareNormalized } from '../../../../utils';
 import type { TranslationKey } from '../../../../utils';
 import { readCsv } from '../../../../utils/csv';
-import { getWebsiteRows, priceElSelector, quantityElSelector } from '../utils';
+import {
+  getWebsiteRows,
+  matchLanguageOption,
+  languageElSelector,
+  priceElSelector,
+  quantityElSelector,
+} from '../utils';
 
 async function getMTGJSONDataImpl() {
   // We can't fetch inside the content script, so we delegate to the background with messages
@@ -45,11 +51,18 @@ class MtgGameManager extends GenericGameManager<'set' | 'isFoil', { set: string,
       name: string,
       quantity: string | undefined,
       price: string | undefined,
+      language: string | undefined,
       set: string | undefined,
       isFoil: string | undefined,
     }) {
     const paramsCode = Number(new URLSearchParams(window.location.search).get('idExpansion'));
     const data = await readCsv(file);
+
+    // Get available language options from the page once
+    const websiteRows = getWebsiteRows();
+    const firstRow = websiteRows[0]?.parentElement?.parentElement?.parentElement;
+    const languageEl: HTMLSelectElement | null = firstRow?.querySelector(languageElSelector) ?? null;
+    const availableLanguageOptions = languageEl ? Array.from(languageEl.options) : [];
 
     const rows = [];
     for (const [i, row] of data.rows.entries()) {
@@ -69,6 +82,18 @@ class MtgGameManager extends GenericGameManager<'set' | 'isFoil', { set: string,
         }
       }
 
+      // Match language during parsing
+      let matchedLanguage = '';
+      let matchedLanguageDisplay = '';
+      if (columnMapping['language']) {
+        const rawLanguage = String(row[columnMapping['language']]);
+        const matchedOption = matchLanguageOption(rawLanguage, availableLanguageOptions);
+        if (matchedOption) {
+          matchedLanguage = matchedOption.value;
+          matchedLanguageDisplay = matchedOption.text;
+        }
+      }
+
       rows.push({
         id: i,
         name: parsedName,
@@ -78,15 +103,17 @@ class MtgGameManager extends GenericGameManager<'set' | 'isFoil', { set: string,
           : false,
         quantity: columnMapping['quantity'] ? (Number(row[columnMapping['quantity']]) || 0) : 0,
         price: columnMapping['price'] ? (Number(row[columnMapping['price']]) || 0) : 0,
+        language: matchedLanguageDisplay,
         enabled,
         matchedName,
+        languageValue: matchedLanguage,
       });
     }
 
     return rows;
   };
 
-  fillPage(rows: (CommonParsedRowFields & { set: string, isFoil: boolean })[]) {
+  fillPage(rows: (CommonParsedRowFields & { set: string, isFoil: boolean, languageValue: string })[]) {
     const websiteRows = getWebsiteRows();
     let count = 0;
     rows.forEach((row) => {
@@ -98,6 +125,7 @@ class MtgGameManager extends GenericGameManager<'set' | 'isFoil', { set: string,
       let quantityEl: HTMLInputElement = trEl.querySelector(quantityElSelector)!;
       let foilEl: HTMLInputElement = trEl.querySelector(foilElSelector)!;
       let priceEl: HTMLInputElement = trEl.querySelector(priceElSelector)!;
+      let languageEl: HTMLSelectElement = trEl.querySelector(languageElSelector)!;
 
       // Check if there's already quantity on this row... if so, we may need to create a new one
       // This covers the foils + non foil rows
@@ -112,12 +140,15 @@ class MtgGameManager extends GenericGameManager<'set' | 'isFoil', { set: string,
         foilEl.checked = foilEl.defaultChecked;
         priceEl = trEl.querySelector(priceElSelector)!;
         priceEl.value = priceEl.defaultValue;
+        languageEl = trEl.querySelector(languageElSelector)!;
+        languageEl.value = languageEl.options[0]?.value ?? '';
       }
 
       // Now input the data
       if (row.quantity) quantityEl.value = row.quantity.toString();
       if (row.isFoil) foilEl.checked = true;
       if (row.price) priceEl.value = row.price.toFixed(2);
+      if (row.languageValue) languageEl.value = row.languageValue;
       count += 1;
     });
     return Promise.resolve(count);
