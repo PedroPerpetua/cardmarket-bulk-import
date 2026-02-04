@@ -6,6 +6,7 @@
 ### Changes
 - Added language support.
   - Thank you [@danimp94](https://github.com/danimp94)!
+- Improved GameManager generalization for better (and easier) implementations.
 
 ### Housekeeping
 - Upgraded dependencies:

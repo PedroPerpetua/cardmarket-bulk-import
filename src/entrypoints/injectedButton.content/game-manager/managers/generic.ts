@@ -137,6 +137,48 @@ class GenericGameManager<
   };
 
   /**
+   * @function fillRow
+   * This function takes a row in the form and fills it with the ParsedRow data.
+   *
+   * This function both takes and returns the <tr /> HTML element that's being affected; it's
+   * important to call the `super` of this function, because the GenericGameManager does the work
+   * of identifying if the "found row" has already been filled and needs to be duplicated.
+   * Subsequent logic should use the returned element from calling the `super`.
+   * @param trEl The <tr /> HTML element that represents the row on the webpage, to be filled.
+   * @param row The row data to use to fill the row.
+   * @returns The <tr /> HTML element that has been filled in.
+   */
+  async fillRow(
+    trEl: HTMLTableRowElement,
+    row: (CommonParsedRowFields & ExtraParsedRowFields),
+  ): Promise<HTMLTableRowElement> {
+    let quantityEl: HTMLInputElement = trEl.querySelector(quantityElSelector)!;
+    let priceEl: HTMLInputElement = trEl.querySelector(priceElSelector)!;
+    let languageEl: HTMLSelectElement = trEl.querySelector(languageElSelector)!;
+
+    // Check if there's already quantity on this row... if so, we may need to create a new one
+    let resolvedEl = trEl;
+    if (quantityEl.value && quantityEl.value !== '0') {
+      const buttonEl: HTMLButtonElement = trEl.querySelector('td button.copy-row-button')!;
+      buttonEl.click();
+      resolvedEl = trEl.previousSibling as HTMLTableRowElement;
+      // We need to point the fields to those of the new parent trEl and reset them
+      quantityEl = resolvedEl.querySelector(quantityElSelector)!;
+      quantityEl.value = quantityEl.defaultValue;
+      priceEl = resolvedEl.querySelector(priceElSelector)!;
+      priceEl.value = priceEl.defaultValue;
+      languageEl = resolvedEl.querySelector(languageElSelector)!;
+      languageEl.value = languageEl.options[0]?.value ?? '';
+    }
+    // Now input the data
+    if (row.quantity) quantityEl.value = row.quantity.toString();
+    if (row.price) priceEl.value = row.price.toFixed(2);
+    if (row.language) languageEl.value = row.language;
+
+    return Promise.resolve(resolvedEl);
+  }
+
+  /**
    * @function fillPage
    * This function takes in a list of (selected) ParsedRows and fills the page Cardmarket page with
    * the data.
@@ -146,33 +188,13 @@ class GenericGameManager<
   async fillPage(rows: (CommonParsedRowFields & ExtraParsedRowFields)[]): Promise<number> {
     const websiteRows = getWebsiteRows();
     let count = 0;
-    rows.forEach((row) => {
+    rows.forEach(async (row) => {
       const nameEl = websiteRows.find(
         (el) => compareNormalized(el.textContent, row.matchedName ?? row.name),
       );
       if (!nameEl) return;
-      let trEl = nameEl.parentElement!.parentElement!.parentElement!;
-      let quantityEl: HTMLInputElement = trEl.querySelector(quantityElSelector)!;
-      let priceEl: HTMLInputElement = trEl.querySelector(priceElSelector)!;
-      let languageEl: HTMLSelectElement = trEl.querySelector(languageElSelector)!;
-
-      // Check if there's already quantity on this row... if so, we may need to create a new one
-      if (quantityEl.value && quantityEl.value !== '0') {
-        const buttonEl: HTMLButtonElement = trEl.querySelector('td button.copy-row-button')!;
-        buttonEl.click();
-        trEl = trEl.previousSibling as HTMLElement;
-        // We need to point the fields to those of the new parent trEl and reset them
-        quantityEl = trEl.querySelector(quantityElSelector)!;
-        quantityEl.value = quantityEl.defaultValue;
-        priceEl = trEl.querySelector(priceElSelector)!;
-        priceEl.value = priceEl.defaultValue;
-        languageEl = trEl.querySelector(languageElSelector)!;
-        languageEl.value = languageEl.options[0]?.value ?? '';
-      }
-      // Now input the data
-      if (row.quantity) quantityEl.value = row.quantity.toString();
-      if (row.price) priceEl.value = row.price.toFixed(2);
-      if (row.language) languageEl.value = row.language;
+      const trEl = nameEl.parentElement!.parentElement!.parentElement! as HTMLTableRowElement;
+      await this.fillRow(trEl, row);
       count += 1;
     });
     return Promise.resolve(count);

@@ -11,8 +11,6 @@ import {
   getWebsiteRows,
   matchLanguageOption,
   languageElSelector,
-  priceElSelector,
-  quantityElSelector,
 } from '../utils';
 
 async function getMTGJSONDataImpl() {
@@ -113,45 +111,14 @@ class MtgGameManager extends GenericGameManager<'set' | 'isFoil', { set: string,
     return rows;
   };
 
-  fillPage(rows: (CommonParsedRowFields & { set: string, isFoil: boolean, languageValue: string })[]) {
-    const websiteRows = getWebsiteRows();
-    let count = 0;
-    rows.forEach((row) => {
-      const nameEl = websiteRows.find(
-        (el) => compareNormalized(el.textContent, row.matchedName ?? row.name),
-      );
-      if (!nameEl) return;
-      let trEl = nameEl.parentElement!.parentElement!.parentElement!;
-      let quantityEl: HTMLInputElement = trEl.querySelector(quantityElSelector)!;
-      let foilEl: HTMLInputElement = trEl.querySelector(foilElSelector)!;
-      let priceEl: HTMLInputElement = trEl.querySelector(priceElSelector)!;
-      let languageEl: HTMLSelectElement = trEl.querySelector(languageElSelector)!;
-
-      // Check if there's already quantity on this row... if so, we may need to create a new one
-      // This covers the foils + non foil rows
-      if (quantityEl.value && quantityEl.value !== '0') {
-        const buttonEl: HTMLButtonElement = trEl.querySelector('td button.copy-row-button')!;
-        buttonEl.click();
-        trEl = trEl.previousSibling as HTMLElement;
-        // We need to point the fields to those of the new parent trEl and reset them
-        quantityEl = trEl.querySelector(quantityElSelector)!;
-        quantityEl.value = quantityEl.defaultValue;
-        foilEl = trEl.querySelector(foilElSelector)!;
-        foilEl.checked = foilEl.defaultChecked;
-        priceEl = trEl.querySelector(priceElSelector)!;
-        priceEl.value = priceEl.defaultValue;
-        languageEl = trEl.querySelector(languageElSelector)!;
-        languageEl.value = languageEl.options[0]?.value ?? '';
-      }
-
-      // Now input the data
-      if (row.quantity) quantityEl.value = row.quantity.toString();
-      if (row.isFoil) foilEl.checked = true;
-      if (row.price) priceEl.value = row.price.toFixed(2);
-      if (row.languageValue) languageEl.value = row.languageValue;
-      count += 1;
-    });
-    return Promise.resolve(count);
+  async fillRow(
+    trEl: HTMLTableRowElement,
+    row: (CommonParsedRowFields & { set: string, isFoil: boolean }),
+  ): Promise<HTMLTableRowElement> {
+    const resolvedEl = await super.fillRow(trEl, row);
+    const foilEl: HTMLInputElement = resolvedEl.querySelector(foilElSelector)!;
+    if (row.isFoil) foilEl.checked = true;
+    return resolvedEl;
   };
 
   extraTableColumns: Record<'set' | 'isFoil', TranslationKey> = {
