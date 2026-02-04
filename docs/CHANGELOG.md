@@ -1,6 +1,13 @@
 # Changelog
 
 
+## [Unreleased]
+
+### Changes
+- Added language support.
+  - Thank you [@danimp94](https://github.com/danimp94)!
+
+
 ## [1.3.1] 2026-01-28
 
 ### Bugfixes
