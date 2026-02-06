@@ -5,20 +5,24 @@ import type { TranslationKey } from '../../../../utils';
 import { readCsv } from '../../../../utils/csv';
 import {
   getWebsiteRows,
-  matchLanguageOption,
   languageElSelector,
   priceElSelector,
   quantityElSelector,
-} from '../utils';
+} from '../utils/html';
+import { matchLanguage } from '../utils/language';
+import type { LanguageData } from '../utils/language';
 
 export type CommonParsedRowFields = {
   id: number,
   name: string,
+  matchedName: string | null,
+  language: {
+    matched: boolean,
+    data: LanguageData,
+  },
   quantity: number,
   price: number,
-  language: string,
   enabled: boolean,
-  matchedName: string | null,
 };
 
 /**
@@ -83,6 +87,34 @@ class GenericGameManager<
     return Promise.resolve(matchedName);
   };
 
+  async parseRow(
+    id: number,
+    rawRowData: Record<string, unknown>,
+    columnMapping: ({
+      name: string,
+      quantity: string | undefined,
+      price: string | undefined,
+      language: string | undefined,
+    } & Record<ExtraColumnInputs, string | undefined>),
+  ): Promise<CommonParsedRowFields & ExtraParsedRowFields> {
+    const parsedName = String(rawRowData[columnMapping['name']]);
+    const matchedName = await this.matchName(parsedName);
+    const language = matchLanguage(
+      columnMapping['language']
+        ? rawRowData[columnMapping['language']] as string | undefined
+        : undefined,
+    );
+    return Promise.resolve({
+      id,
+      name: parsedName,
+      matchedName,
+      language,
+      quantity: columnMapping['quantity'] ? (Number(rawRowData[columnMapping['quantity']]) || 0) : 0,
+      price: columnMapping['price'] ? (Number(rawRowData[columnMapping['price']]) || 0) : 0,
+      enabled: !!matchedName,
+    } as CommonParsedRowFields & ExtraParsedRowFields);
+  }
+
   /**
    * @function parseCsv
    * This function is what will be used to transform the columns inputs to the internal ParsedRow
@@ -101,39 +133,11 @@ class GenericGameManager<
     } & Record<ExtraColumnInputs, string | undefined>),
   ): Promise<(CommonParsedRowFields & ExtraParsedRowFields)[]> {
     const data = await readCsv(file);
-
-    // Get available language options from the page once
-    const websiteRows = getWebsiteRows();
-    const firstRow = websiteRows[0]?.parentElement?.parentElement?.parentElement;
-    const languageEl: HTMLSelectElement | null = firstRow?.querySelector(languageElSelector) ?? null;
-    const availableLanguageOptions = languageEl ? Array.from(languageEl.options) : [];
-
     const rows = [];
     for (const [i, row] of data.rows.entries()) {
-      const parsedName = String(row[columnMapping['name']]);
-      const matchedName = await this.matchName(parsedName);
-
-      let matchedLanguage = '';
-      if (columnMapping['language']) {
-        const rawLanguage = String(row[columnMapping['language']]);
-        const matchedOption = matchLanguageOption(rawLanguage, availableLanguageOptions);
-        if (matchedOption) {
-          matchedLanguage = matchedOption.value;
-        }
-      }
-
-      rows.push({
-        id: i,
-        name: parsedName,
-        quantity: columnMapping['quantity'] ? (Number(row[columnMapping['quantity']]) || 0) : 0,
-        price: columnMapping['price'] ? (Number(row[columnMapping['price']]) || 0) : 0,
-        language: matchedLanguage,
-        enabled: !!matchedName,
-        matchedName,
-      });
+      rows.push(await this.parseRow(i, row, columnMapping));
     }
-
-    return rows as (CommonParsedRowFields & ExtraParsedRowFields)[];
+    return rows;
   };
 
   /**
@@ -173,7 +177,7 @@ class GenericGameManager<
     // Now input the data
     if (row.quantity) quantityEl.value = row.quantity.toString();
     if (row.price) priceEl.value = row.price.toFixed(2);
-    if (row.language) languageEl.value = row.language;
+    if (row.language.matched) languageEl.value = row.language.data.mkmValue.toString();
 
     return Promise.resolve(resolvedEl);
   }

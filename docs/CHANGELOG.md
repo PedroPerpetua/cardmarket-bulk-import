@@ -10,7 +10,7 @@
 
 ### Housekeeping
 - Upgraded dependencies:
-  - `@types/react`: `19.2.10` -> `19.2.11`.
+  - `@types/react`: `19.2.10` -> `19.2.13`.
   - `eslint-plugin-react-refresh`: `0.4.26` -> `0.5.0`.
 
 

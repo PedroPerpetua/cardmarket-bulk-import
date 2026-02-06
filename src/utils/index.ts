@@ -2,7 +2,7 @@ import type { GeneratedI18nStructure } from '../../.wxt/i18n';
 
 export function normalizeString(str?: string) {
   if (!str) return '';
-  return str.normalize('NFD').replace(/\p{Diacritic}/gu, '').toLowerCase();
+  return str.trim().normalize('NFD').replace(/\p{Diacritic}/gu, '').toLowerCase();
 }
 
 export function compareNormalized(str1: string, str2: string) {

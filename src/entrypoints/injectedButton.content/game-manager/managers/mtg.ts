@@ -6,12 +6,6 @@ import GenericGameManager from './generic';
 import type { CommonParsedRowFields } from './generic';
 import { compareNormalized } from '../../../../utils';
 import type { TranslationKey } from '../../../../utils';
-import { readCsv } from '../../../../utils/csv';
-import {
-  getWebsiteRows,
-  matchLanguageOption,
-  languageElSelector,
-} from '../utils';
 
 async function getMTGJSONDataImpl() {
   // We can't fetch inside the content script, so we delegate to the background with messages
@@ -43,8 +37,9 @@ class MtgGameManager extends GenericGameManager<'set' | 'isFoil', { set: string,
     isFoil: yup.string(),
   });
 
-  async parseCsv(
-    file: File,
+  async parseRow(
+    id: number,
+    rawRowData: Record<string, unknown>,
     columnMapping: {
       name: string,
       quantity: string | undefined,
@@ -53,63 +48,29 @@ class MtgGameManager extends GenericGameManager<'set' | 'isFoil', { set: string,
       set: string | undefined,
       isFoil: string | undefined,
     }) {
-    const paramsCode = Number(new URLSearchParams(window.location.search).get('idExpansion'));
-    const data = await readCsv(file);
-
-    // Get available language options from the page once
-    const websiteRows = getWebsiteRows();
-    const firstRow = websiteRows[0]?.parentElement?.parentElement?.parentElement;
-    const languageEl: HTMLSelectElement | null = firstRow?.querySelector(languageElSelector) ?? null;
-    const availableLanguageOptions = languageEl ? Array.from(languageEl.options) : [];
-
-    const rows = [];
-    for (const [i, row] of data.rows.entries()) {
-      const parsedName = String(row[columnMapping['name']]);
-      const matchedName = await this.matchName(parsedName);
-
-      let set = columnMapping['set'] ? String(row[columnMapping['set']]) : '';
-      let enabled = !!matchedName;
-      if (set) {
-        const data = await matchSetToCardmarketId(set);
-        if (data) {
-          set = data.code;
-          if (data.cardmarketId !== paramsCode) enabled = false;
-        }
-        else {
-          set = '';
-        }
+    const parsedData = await super.parseRow(id, rawRowData, columnMapping);
+    let set = columnMapping['set'] ? String(rawRowData[columnMapping['set']]) : '';
+    let enabled = !!parsedData.matchedName;
+    if (set) {
+      const paramsCode = Number(new URLSearchParams(window.location.search).get('idExpansion'));
+      const data = await matchSetToCardmarketId(set);
+      if (data) {
+        set = data.code;
+        if (data.cardmarketId !== paramsCode) enabled = false;
       }
-
-      // Match language during parsing
-      let matchedLanguage = '';
-      let matchedLanguageDisplay = '';
-      if (columnMapping['language']) {
-        const rawLanguage = String(row[columnMapping['language']]);
-        const matchedOption = matchLanguageOption(rawLanguage, availableLanguageOptions);
-        if (matchedOption) {
-          matchedLanguage = matchedOption.value;
-          matchedLanguageDisplay = matchedOption.text;
-        }
+      else {
+        set = '';
       }
-
-      rows.push({
-        id: i,
-        name: parsedName,
-        set: set,
-        isFoil: columnMapping['isFoil']
-          ? VALID_FOIL_VALUES.includes(String(row[columnMapping['isFoil']]).toLowerCase())
-          : false,
-        quantity: columnMapping['quantity'] ? (Number(row[columnMapping['quantity']]) || 0) : 0,
-        price: columnMapping['price'] ? (Number(row[columnMapping['price']]) || 0) : 0,
-        language: matchedLanguageDisplay,
-        enabled,
-        matchedName,
-        languageValue: matchedLanguage,
-      });
     }
-
-    return rows;
-  };
+    return {
+      ...parsedData,
+      set: set,
+      isFoil: columnMapping['isFoil']
+        ? VALID_FOIL_VALUES.includes(String(rawRowData[columnMapping['isFoil']]).toLowerCase())
+        : false,
+      enabled,
+    };
+  }
 
   async fillRow(
     trEl: HTMLTableRowElement,
