@@ -1,7 +1,7 @@
 # Changelog
 
 
-## [Unreleased]
+## [1.3.2] 2026-02-07
 
 ### Changes
 - Added language support.
@@ -12,6 +12,7 @@
 - Upgraded dependencies:
   - `@types/react`: `19.2.10` -> `19.2.13`.
   - `eslint-plugin-react-refresh`: `0.4.26` -> `0.5.0`.
+  - `wxt`: `0.20.13` -> `0.20.14`.
 
 
 ## [1.3.1] 2026-01-28

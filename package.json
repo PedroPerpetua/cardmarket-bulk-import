@@ -2,7 +2,7 @@
   "name": "cardmarket-bulk-import",
   "description": "Extension to allow CSV importing on Cardmarket's Bulk Listing",
   "private": true,
-  "version": "1.3.1",
+  "version": "1.3.2",
   "type": "module",
   "scripts": {
     "lint": "tsc -b; eslint --fix",
@@ -50,7 +50,7 @@
     "mtggraphql": "1.0.2",
     "typescript": "5.9.3",
     "typescript-eslint": "8.54.0",
-    "wxt": "0.20.13"
+    "wxt": "0.20.14"
   },
   "engines": {
     "node": "24.13.0",
