@@ -15,6 +15,7 @@ import useGameManager from '../game-manager/useGameManager';
 type BaseImportFormValues = {
   files: FileList,
   name: string,
+  language: string | undefined,
   quantity: string | undefined,
   price: string | undefined,
 };
@@ -24,6 +25,7 @@ const baseValidationSchema: yup.ObjectSchema<BaseImportFormValues> = yup.object(
     .required(i18n.t('injectedButton.gameManagers.common.importCsvForm.files.required')),
   name: yup.string()
     .required(i18n.t('injectedButton.gameManagers.common.importCsvForm.name.required')),
+  language: yup.string(),
   quantity: yup.string(),
   price: yup.string(),
 });
@@ -88,6 +90,13 @@ function ImportCsvForm({ onSubmit }: ImportCsvFormProps) {
         formId="importCsvForm.name"
         name="name"
         label={i18n.t('injectedButton.gameManagers.common.importCsvForm.name.label')}
+        options={csvColumns}
+      />
+      <ColumnSelect
+        control={control}
+        formId="importCsvForm.language"
+        name="language"
+        label={i18n.t('injectedButton.gameManagers.common.importCsvForm.language.label')}
         options={csvColumns}
       />
       {

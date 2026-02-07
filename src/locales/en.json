@@ -71,6 +71,9 @@
                         "label": "Name Column",
                         "required": "You must select a column"
                     },
+                    "language": {
+                        "label": "Language Column"
+                    },
                     "quantity": {
                         "label": "Quantity Column"
                     },
@@ -81,6 +84,7 @@
                 "selectRowsFormTable": {
                     "check": "Fill",
                     "name": "Name",
+                    "language": "Language",
                     "quantity": "Quantity",
                     "price": "Price"
                 }

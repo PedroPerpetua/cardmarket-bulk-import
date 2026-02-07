@@ -3,15 +3,26 @@ import * as yup from 'yup';
 import { compareNormalized, normalizeString } from '../../../../utils';
 import type { TranslationKey } from '../../../../utils';
 import { readCsv } from '../../../../utils/csv';
-import { getWebsiteRows, priceElSelector, quantityElSelector } from '../utils';
+import {
+  getWebsiteRows,
+  languageElSelector,
+  priceElSelector,
+  quantityElSelector,
+} from '../utils/html';
+import { matchLanguage } from '../utils/language';
+import type { LanguageData } from '../utils/language';
 
 export type CommonParsedRowFields = {
   id: number,
   name: string,
+  matchedName: string | null,
+  language: {
+    matched: boolean,
+    data: LanguageData,
+  },
   quantity: number,
   price: number,
   enabled: boolean,
-  matchedName: string | null,
 };
 
 /**
@@ -22,12 +33,12 @@ export type CommonParsedRowFields = {
  *
  * This GenericGameManager has the base functionality that can be used generically for any game.
  *
- * All managers have to, by default, take an input column for the article name, and optional inputs
- * for price and quantity. They can define any extra columns they wish to parse.
+ * All managers have to, by default, take an input column for the article name, and optional input
+ * columns for language, quantity and price. They can define any extra columns they wish to parse.
  *
  * All managers will have their own internal ParsedRow type, that must include at least, id, name,
- * quantity, price, enabled and matchedName. They can parse and display any extra fields, but these
- * fields are required.
+ * matchedName, language, quantity, price and enabled. They can parse and display any extra fields,
+ * but these fields are required.
  */
 class GenericGameManager<
   ExtraColumnInputs extends string = string,
@@ -77,6 +88,47 @@ class GenericGameManager<
   };
 
   /**
+   * @function parseRow
+   * This function takes the raw data for a row in the CSV and parsed it to generate a ParsedRow.
+   *
+   * This function takes the designated id for the row, the raw data extracted from the CSV, and the
+   * column mapping given by the user. Calls to this function can be chained by subclasses in order
+   * to parse additional information, by calling the `super` and then adding their own parsing to
+   * the return value.
+   * @param id The id that should be attributed to the parsed row.
+   * @param rawRowData The raw information from the CSV to be parsed.
+   * @param columnMapping The mappings from the property names to the columns in the CSV.
+   * @returns The ParsedRow obtained from raw row data.
+   */
+  async parseRow(
+    id: number,
+    rawRowData: Record<string, unknown>,
+    columnMapping: ({
+      name: string,
+      quantity: string | undefined,
+      price: string | undefined,
+      language: string | undefined,
+    } & Record<ExtraColumnInputs, string | undefined>),
+  ): Promise<CommonParsedRowFields & ExtraParsedRowFields> {
+    const parsedName = String(rawRowData[columnMapping['name']]);
+    const matchedName = await this.matchName(parsedName);
+    const language = matchLanguage(
+      columnMapping['language']
+        ? rawRowData[columnMapping['language']] as string | undefined
+        : undefined,
+    );
+    return Promise.resolve({
+      id,
+      name: parsedName,
+      matchedName,
+      language,
+      quantity: columnMapping['quantity'] ? (Number(rawRowData[columnMapping['quantity']]) || 0) : 0,
+      price: columnMapping['price'] ? (Number(rawRowData[columnMapping['price']]) || 0) : 0,
+      enabled: !!matchedName,
+    } as CommonParsedRowFields & ExtraParsedRowFields);
+  }
+
+  /**
    * @function parseCsv
    * This function is what will be used to transform the columns inputs to the internal ParsedRow
    * structure.
@@ -90,27 +142,58 @@ class GenericGameManager<
       name: string,
       quantity: string | undefined,
       price: string | undefined,
+      language: string | undefined,
     } & Record<ExtraColumnInputs, string | undefined>),
   ): Promise<(CommonParsedRowFields & ExtraParsedRowFields)[]> {
     const data = await readCsv(file);
-
     const rows = [];
     for (const [i, row] of data.rows.entries()) {
-      const parsedName = String(row[columnMapping['name']]);
-      const matchedName = await this.matchName(parsedName);
-
-      rows.push({
-        id: i,
-        name: parsedName,
-        quantity: columnMapping['quantity'] ? (Number(row[columnMapping['quantity']]) || 0) : 0,
-        price: columnMapping['price'] ? (Number(row[columnMapping['price']]) || 0) : 0,
-        enabled: !!matchedName,
-        matchedName,
-      });
+      rows.push(await this.parseRow(i, row, columnMapping));
     }
-
-    return rows as (CommonParsedRowFields & ExtraParsedRowFields)[];
+    return rows;
   };
+
+  /**
+   * @function fillRow
+   * This function takes a row in the form and fills it with the ParsedRow data.
+   *
+   * This function both takes and returns the <tr /> HTML element that's being affected; it's
+   * important to call the `super` of this function, because the GenericGameManager does the work
+   * of identifying if the "found row" has already been filled and needs to be duplicated.
+   * Subsequent logic should use the returned element from calling the `super`.
+   * @param trEl The <tr /> HTML element that represents the row on the webpage, to be filled.
+   * @param row The row data to use to fill the row.
+   * @returns The <tr /> HTML element that has been filled in.
+   */
+  async fillRow(
+    trEl: HTMLTableRowElement,
+    row: (CommonParsedRowFields & ExtraParsedRowFields),
+  ): Promise<HTMLTableRowElement> {
+    let quantityEl: HTMLInputElement = trEl.querySelector(quantityElSelector)!;
+    let priceEl: HTMLInputElement = trEl.querySelector(priceElSelector)!;
+    let languageEl: HTMLSelectElement = trEl.querySelector(languageElSelector)!;
+
+    // Check if there's already quantity on this row... if so, we may need to create a new one
+    let resolvedEl = trEl;
+    if (quantityEl.value && quantityEl.value !== '0') {
+      const buttonEl: HTMLButtonElement = trEl.querySelector('td button.copy-row-button')!;
+      buttonEl.click();
+      resolvedEl = trEl.previousSibling as HTMLTableRowElement;
+      // We need to point the fields to those of the new parent trEl and reset them
+      quantityEl = resolvedEl.querySelector(quantityElSelector)!;
+      quantityEl.value = quantityEl.defaultValue;
+      priceEl = resolvedEl.querySelector(priceElSelector)!;
+      priceEl.value = priceEl.defaultValue;
+      languageEl = resolvedEl.querySelector(languageElSelector)!;
+      languageEl.value = languageEl.options[0]?.value ?? '';
+    }
+    // Now input the data
+    if (row.quantity) quantityEl.value = row.quantity.toString();
+    if (row.price) priceEl.value = row.price.toFixed(2);
+    if (row.language.matched) languageEl.value = row.language.data.mkmValue.toString();
+
+    return Promise.resolve(resolvedEl);
+  }
 
   /**
    * @function fillPage
@@ -122,31 +205,15 @@ class GenericGameManager<
   async fillPage(rows: (CommonParsedRowFields & ExtraParsedRowFields)[]): Promise<number> {
     const websiteRows = getWebsiteRows();
     let count = 0;
-    rows.forEach((row) => {
+    for (const row of rows) {
       const nameEl = websiteRows.find(
         (el) => compareNormalized(el.textContent, row.matchedName ?? row.name),
       );
-      if (!nameEl) return;
-      let trEl = nameEl.parentElement!.parentElement!.parentElement!;
-      let quantityEl: HTMLInputElement = trEl.querySelector(quantityElSelector)!;
-      let priceEl: HTMLInputElement = trEl.querySelector(priceElSelector)!;
-
-      // Check if there's already quantity on this row... if so, we may need to create a new one
-      if (quantityEl.value && quantityEl.value !== '0') {
-        const buttonEl: HTMLButtonElement = trEl.querySelector('td button.copy-row-button')!;
-        buttonEl.click();
-        trEl = trEl.previousSibling as HTMLElement;
-        // We need to point the fields to those of the new parent trEl and reset them
-        quantityEl = trEl.querySelector(quantityElSelector)!;
-        quantityEl.value = quantityEl.defaultValue;
-        priceEl = trEl.querySelector(priceElSelector)!;
-        priceEl.value = priceEl.defaultValue;
-      }
-      // Now input the data
-      if (row.quantity) quantityEl.value = row.quantity.toString();
-      if (row.price) priceEl.value = row.price.toFixed(2);
+      if (!nameEl) continue;
+      const trEl = nameEl.parentElement!.parentElement!.parentElement! as HTMLTableRowElement;
+      await this.fillRow(trEl, row);
       count += 1;
-    });
+    };
     return Promise.resolve(count);
   };
 

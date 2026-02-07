@@ -121,6 +121,9 @@ function SelectRowsForm({ rows, onSubmit }: SelectRowsFormProps) {
               <th className="col">
                 { i18n.t('injectedButton.gameManagers.common.selectRowsFormTable.name') }
               </th>
+              <th className="col-md-1">
+                { i18n.t('injectedButton.gameManagers.common.selectRowsFormTable.language') }
+              </th>
               {
                 Object.entries(gameManager.extraTableColumns).map(([key, value]) => {
                   if (!value) return null;
@@ -204,6 +207,17 @@ function SelectRowsForm({ rows, onSubmit }: SelectRowsFormProps) {
                       )
                     }
                   </td>
+                  <td>
+                    <OverlayTrigger
+                      overlay={(
+                        <Tooltip>{ r.language.data.mkmLabels[0] }</Tooltip>
+                      )}
+                    >
+                      <div className={clsx(!r.language.matched && 'opacity-25', 'w-50 mx-auto')}>
+                        { r.language.data.flagElement }
+                      </div>
+                    </OverlayTrigger>
+                  </td>
                   {
                     Object.entries(gameManager.extraTableColumns)
                       .filter(([, v]) => !!v)
@@ -240,6 +254,7 @@ function SelectRowsForm({ rows, onSubmit }: SelectRowsFormProps) {
                         <td key={k}>&nbsp;</td>
                       ))
                   }
+                  <td>&nbsp;</td>
                   <td>&nbsp;</td>
                   <td>&nbsp;</td>
                 </tr>

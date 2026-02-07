@@ -1,5 +1,3 @@
-/* eslint-disable react-refresh/only-export-components */
-
 import { defineContentScript, createIntegratedUi } from '#imports';
 
 import ReactDOM from 'react-dom/client';

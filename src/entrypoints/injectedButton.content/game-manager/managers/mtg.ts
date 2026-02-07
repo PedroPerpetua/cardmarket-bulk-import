@@ -6,8 +6,6 @@ import GenericGameManager from './generic';
 import type { CommonParsedRowFields } from './generic';
 import { compareNormalized } from '../../../../utils';
 import type { TranslationKey } from '../../../../utils';
-import { readCsv } from '../../../../utils/csv';
-import { getWebsiteRows, priceElSelector, quantityElSelector } from '../utils';
 
 async function getMTGJSONDataImpl() {
   // We can't fetch inside the content script, so we delegate to the background with messages
@@ -39,88 +37,49 @@ class MtgGameManager extends GenericGameManager<'set' | 'isFoil', { set: string,
     isFoil: yup.string(),
   });
 
-  async parseCsv(
-    file: File,
+  async parseRow(
+    id: number,
+    rawRowData: Record<string, unknown>,
     columnMapping: {
       name: string,
       quantity: string | undefined,
       price: string | undefined,
+      language: string | undefined,
       set: string | undefined,
       isFoil: string | undefined,
     }) {
-    const paramsCode = Number(new URLSearchParams(window.location.search).get('idExpansion'));
-    const data = await readCsv(file);
-
-    const rows = [];
-    for (const [i, row] of data.rows.entries()) {
-      const parsedName = String(row[columnMapping['name']]);
-      const matchedName = await this.matchName(parsedName);
-
-      let set = columnMapping['set'] ? String(row[columnMapping['set']]) : '';
-      let enabled = !!matchedName;
-      if (set) {
-        const data = await matchSetToCardmarketId(set);
-        if (data) {
-          set = data.code;
-          if (data.cardmarketId !== paramsCode) enabled = false;
-        }
-        else {
-          set = '';
-        }
+    const parsedData = await super.parseRow(id, rawRowData, columnMapping);
+    let set = columnMapping['set'] ? String(rawRowData[columnMapping['set']]) : '';
+    let enabled = !!parsedData.matchedName;
+    if (set) {
+      const paramsCode = Number(new URLSearchParams(window.location.search).get('idExpansion'));
+      const data = await matchSetToCardmarketId(set);
+      if (data) {
+        set = data.code;
+        if (data.cardmarketId !== paramsCode) enabled = false;
       }
-
-      rows.push({
-        id: i,
-        name: parsedName,
-        set: set,
-        isFoil: columnMapping['isFoil']
-          ? VALID_FOIL_VALUES.includes(String(row[columnMapping['isFoil']]).toLowerCase())
-          : false,
-        quantity: columnMapping['quantity'] ? (Number(row[columnMapping['quantity']]) || 0) : 0,
-        price: columnMapping['price'] ? (Number(row[columnMapping['price']]) || 0) : 0,
-        enabled,
-        matchedName,
-      });
+      else {
+        set = '';
+      }
     }
+    return {
+      ...parsedData,
+      set: set,
+      isFoil: columnMapping['isFoil']
+        ? VALID_FOIL_VALUES.includes(String(rawRowData[columnMapping['isFoil']]).toLowerCase())
+        : false,
+      enabled,
+    };
+  }
 
-    return rows;
-  };
-
-  fillPage(rows: (CommonParsedRowFields & { set: string, isFoil: boolean })[]) {
-    const websiteRows = getWebsiteRows();
-    let count = 0;
-    rows.forEach((row) => {
-      const nameEl = websiteRows.find(
-        (el) => compareNormalized(el.textContent, row.matchedName ?? row.name),
-      );
-      if (!nameEl) return;
-      let trEl = nameEl.parentElement!.parentElement!.parentElement!;
-      let quantityEl: HTMLInputElement = trEl.querySelector(quantityElSelector)!;
-      let foilEl: HTMLInputElement = trEl.querySelector(foilElSelector)!;
-      let priceEl: HTMLInputElement = trEl.querySelector(priceElSelector)!;
-
-      // Check if there's already quantity on this row... if so, we may need to create a new one
-      // This covers the foils + non foil rows
-      if (quantityEl.value && quantityEl.value !== '0') {
-        const buttonEl: HTMLButtonElement = trEl.querySelector('td button.copy-row-button')!;
-        buttonEl.click();
-        trEl = trEl.previousSibling as HTMLElement;
-        // We need to point the fields to those of the new parent trEl and reset them
-        quantityEl = trEl.querySelector(quantityElSelector)!;
-        quantityEl.value = quantityEl.defaultValue;
-        foilEl = trEl.querySelector(foilElSelector)!;
-        foilEl.checked = foilEl.defaultChecked;
-        priceEl = trEl.querySelector(priceElSelector)!;
-        priceEl.value = priceEl.defaultValue;
-      }
-
-      // Now input the data
-      if (row.quantity) quantityEl.value = row.quantity.toString();
-      if (row.isFoil) foilEl.checked = true;
-      if (row.price) priceEl.value = row.price.toFixed(2);
-      count += 1;
-    });
-    return Promise.resolve(count);
+  async fillRow(
+    trEl: HTMLTableRowElement,
+    row: (CommonParsedRowFields & { set: string, isFoil: boolean }),
+  ): Promise<HTMLTableRowElement> {
+    const resolvedEl = await super.fillRow(trEl, row);
+    const foilEl: HTMLInputElement = resolvedEl.querySelector(foilElSelector)!;
+    if (row.isFoil) foilEl.checked = true;
+    return resolvedEl;
   };
 
   extraTableColumns: Record<'set' | 'isFoil', TranslationKey> = {
