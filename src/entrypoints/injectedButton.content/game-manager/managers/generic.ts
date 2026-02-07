@@ -33,12 +33,12 @@ export type CommonParsedRowFields = {
  *
  * This GenericGameManager has the base functionality that can be used generically for any game.
  *
- * All managers have to, by default, take an input column for the article name, and optional inputs
- * for price, quantity, and language. They can define any extra columns they wish to parse.
+ * All managers have to, by default, take an input column for the article name, and optional input
+ * columns for language, quantity and price. They can define any extra columns they wish to parse.
  *
  * All managers will have their own internal ParsedRow type, that must include at least, id, name,
- * quantity, price, language, enabled and matchedName. They can parse and display any extra fields, but these
- * fields are required.
+ * matchedName, language, quantity, price and enabled. They can parse and display any extra fields,
+ * but these fields are required.
  */
 class GenericGameManager<
   ExtraColumnInputs extends string = string,
@@ -87,6 +87,19 @@ class GenericGameManager<
     return Promise.resolve(matchedName);
   };
 
+  /**
+   * @function parseRow
+   * This function takes the raw data for a row in the CSV and parsed it to generate a ParsedRow.
+   *
+   * This function takes the designated id for the row, the raw data extracted from the CSV, and the
+   * column mapping given by the user. Calls to this function can be chained by subclasses in order
+   * to parse additional information, by calling the `super` and then adding their own parsing to
+   * the return value.
+   * @param id The id that should be attributed to the parsed row.
+   * @param rawRowData The raw information from the CSV to be parsed.
+   * @param columnMapping The mappings from the property names to the columns in the CSV.
+   * @returns The ParsedRow obtained from raw row data.
+   */
   async parseRow(
     id: number,
     rawRowData: Record<string, unknown>,

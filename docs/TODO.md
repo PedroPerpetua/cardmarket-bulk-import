@@ -1,7 +1,7 @@
 # Features
 - Support more import formats.
 - Support "copy and paste" a CSV directly onto the form.
-- Support more properties (language, signed, etc) for all games.
+- Support more properties (signed, etc) for all games.
 - Tests?
 
 # Bugfixes
