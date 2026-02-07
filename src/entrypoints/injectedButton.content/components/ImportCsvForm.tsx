@@ -92,6 +92,13 @@ function ImportCsvForm({ onSubmit }: ImportCsvFormProps) {
         label={i18n.t('injectedButton.gameManagers.common.importCsvForm.name.label')}
         options={csvColumns}
       />
+      <ColumnSelect
+        control={control}
+        formId="importCsvForm.language"
+        name="language"
+        label={i18n.t('injectedButton.gameManagers.common.importCsvForm.language.label')}
+        options={csvColumns}
+      />
       {
         Object.entries(gameManager.extraColumns).map(([name, label]) => (
           <ColumnSelect
@@ -116,13 +123,6 @@ function ImportCsvForm({ onSubmit }: ImportCsvFormProps) {
         formId="importCsvForm.price"
         name="price"
         label={i18n.t('injectedButton.gameManagers.common.importCsvForm.price.label')}
-        options={csvColumns}
-      />
-      <ColumnSelect
-        control={control}
-        formId="importCsvForm.language"
-        name="language"
-        label={i18n.t('injectedButton.gameManagers.common.importCsvForm.language.label')}
         options={csvColumns}
       />
       <Button type="submit" className="mx-auto">

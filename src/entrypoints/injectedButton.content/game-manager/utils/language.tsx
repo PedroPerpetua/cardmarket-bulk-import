@@ -182,12 +182,12 @@ function getAvailableLanguagesImpl() {
 
 export const getAvailableLanguages = memoize(getAvailableLanguagesImpl);
 
-function matchLanguageImpl(inputLanguage?: string) {
+function matchLanguageImpl(inputLanguage?: string): { matched: boolean, data: LanguageData } {
   const availableLanguages = getAvailableLanguages();
   const fallback = availableLanguages.at(0) ?? mkmLanguages[0];
   if (!inputLanguage) return {
     matched: false,
-    language: fallback,
+    data: fallback,
   };
   const match = availableLanguages.find((lngData) => {
     if (compareNormalized(inputLanguage, lngData.mkmValue.toString())) return true;
