@@ -15,9 +15,9 @@ import useGameManager from '../game-manager/useGameManager';
 type BaseImportFormValues = {
   files: FileList,
   name: string,
+  language: string | undefined,
   quantity: string | undefined,
   price: string | undefined,
-  language: string | undefined,
 };
 
 const baseValidationSchema: yup.ObjectSchema<BaseImportFormValues> = yup.object({
@@ -25,9 +25,9 @@ const baseValidationSchema: yup.ObjectSchema<BaseImportFormValues> = yup.object(
     .required(i18n.t('injectedButton.gameManagers.common.importCsvForm.files.required')),
   name: yup.string()
     .required(i18n.t('injectedButton.gameManagers.common.importCsvForm.name.required')),
+  language: yup.string(),
   quantity: yup.string(),
   price: yup.string(),
-  language: yup.string(),
 });
 
 type ImportFormValues = BaseImportFormValues & Record<string, string | undefined>;

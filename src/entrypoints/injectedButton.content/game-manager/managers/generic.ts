@@ -192,15 +192,15 @@ class GenericGameManager<
   async fillPage(rows: (CommonParsedRowFields & ExtraParsedRowFields)[]): Promise<number> {
     const websiteRows = getWebsiteRows();
     let count = 0;
-    rows.forEach(async (row) => {
+    for (const row of rows) {
       const nameEl = websiteRows.find(
         (el) => compareNormalized(el.textContent, row.matchedName ?? row.name),
       );
-      if (!nameEl) return;
+      if (!nameEl) continue;
       const trEl = nameEl.parentElement!.parentElement!.parentElement! as HTMLTableRowElement;
       await this.fillRow(trEl, row);
       count += 1;
-    });
+    };
     return Promise.resolve(count);
   };
 
