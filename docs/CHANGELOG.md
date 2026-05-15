@@ -1,6 +1,6 @@
 # Changelog
 
-## UNRELEASED
+## [1.3.3] 2026-05-15
 
 ### Bugfixes
 - Fixed issue with copying rows, in which leftover data was not being overridden.
