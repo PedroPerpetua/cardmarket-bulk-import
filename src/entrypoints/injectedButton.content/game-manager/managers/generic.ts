@@ -188,9 +188,9 @@ class GenericGameManager<
       languageEl.value = languageEl.options[0]?.value ?? '';
     }
     // Now input the data
-    if (row.quantity) quantityEl.value = row.quantity.toString();
-    if (row.price) priceEl.value = row.price.toFixed(2);
-    if (row.language.matched) languageEl.value = row.language.data.mkmValue.toString();
+    quantityEl.value = row.quantity.toString();
+    priceEl.value = row.price.toFixed(2);
+    languageEl.value = row.language.data.mkmValue.toString();
 
     return Promise.resolve(resolvedEl);
   }

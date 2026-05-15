@@ -2,6 +2,9 @@
 
 ## UNRELEASED
 
+### Bugfixes
+- Fixed issue with copying rows, in which leftover data was not being overridden.
+
 ### Housekeeping
 - Upgraded engines:
   - `node`: `24.13.0` -> `24.15.0`.

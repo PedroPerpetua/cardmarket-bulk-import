@@ -78,7 +78,7 @@ class MtgGameManager extends GenericGameManager<'set' | 'isFoil', { set: string,
   ): Promise<HTMLTableRowElement> {
     const resolvedEl = await super.fillRow(trEl, row);
     const foilEl: HTMLInputElement = resolvedEl.querySelector(foilElSelector)!;
-    if (row.isFoil) foilEl.checked = true;
+    foilEl.checked = row.isFoil;
     return resolvedEl;
   };
 
