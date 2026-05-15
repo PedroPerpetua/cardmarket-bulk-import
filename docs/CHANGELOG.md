@@ -1,5 +1,31 @@
 # Changelog
 
+## UNRELEASED
+
+### Housekeeping
+- Upgraded engines:
+  - `node`: `24.13.0` -> `24.15.0`.
+  - `yarn`: `4.12.0` -> `4.14.1`.
+- Upgraded dependencies:
+  - `@wxt-dev/auto-icons`: `1.1.0` -> `1.1.1`.
+  - `@wxt-dev/i18n`: `0.2.4` -> `0.2.5`.
+  - `country-flag-icons`: `1.6.12` -> `1.6.17`.
+  - `csv-parse`: `6.1.0` -> `6.2.1`.
+  - `fuse.js`: `7.1.0` -> `7.3.0`.
+  - `memoize`: `10.2.0` -> `11.0.0`.
+  - `react`: `19.2.4` -> `19.2.6`.
+  - `react-dom`: `19.2.4` -> `19.2.6`.
+  - `react-hook-form`: `7.71.1` -> `7.75.0`.
+  - `vite-plugin-node-polyfills`: `0.25.0` -> `0.26.0`.
+  - `@stylistic/eslint-plugin`: `5.7.1` -> `5.10.0`.
+  - `@types/react`: `19.2.13` -> `19.2.14`.
+  - `@wxt-dev/module-react`: `1.1.5` -> `1.2.2`.
+  - `eslint-plugin-react-hooks`: `7.0.1` -> `7.1.1`.
+  - `eslint-plugin-react-refresh`: `0.5.0` -> `0.5.2`.
+  - `typescript`: `5.9.3` -> `6.0.3`.
+  - `typescript-eslint`: `8.54.0` -> `8.59.3`.
+  - `wxt`: `0.20.1` -> `0.20.26`.
+
 
 ## [1.3.2] 2026-02-07
 
