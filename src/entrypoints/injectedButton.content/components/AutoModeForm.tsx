@@ -69,11 +69,13 @@ export default function AutoModeForm({ onClose }: AutoModeFormProps) {
   );
   const [isSynced, setIsSynced]   = useState(() => isAutoModeActive() || Object.keys(getStoredExpansionMap()).length > 0);
   const fileRef = useRef<HTMLInputElement>(null);
+  // Prevent double-invocation of resumeAutoRun (e.g. from useEffect + manual Resume button)
+  const resumeRunningRef = useRef(false);
 
   // On mount: resume an in-progress run, or show "previous run done" message
   useEffect(() => {
     if (isAutoModeActive()) {
-      resumeAutoRun();
+      resumeAutoRun();  // resumeRunningRef guards against double-fire
     } else if (getAutoCurrentIndex() > 0) {
       // Queue is cleared but current > 0 → previous run completed
       setStatus({ type: 'done', filled: 0, total: getAutoCurrentIndex() });
@@ -201,6 +203,20 @@ export default function AutoModeForm({ onClose }: AutoModeFormProps) {
     startNextSet(queue, 0, missing);
   }
 
+  // Manual override: skip the current set and force-advance to the next one
+  function handleSkipSet() {
+    const queue = getAutoQueue();
+    const idx   = getAutoCurrentIndex();
+    if (idx < 0 || idx >= queue.length) return;
+    const nextIdx = idx + 1;
+    queue[idx].done = true;
+    setAutoQueue(queue);
+    setAutoCurrentIndex(nextIdx);
+    resumeRunningRef.current = false;  // allow resumeAutoRun to run again
+    if (nextIdx < queue.length) startNextSet(queue, nextIdx);
+    else { setStatus({ type: 'done', filled: 0, total: queue.length }); clearAutoQueue(); }
+  }
+
   // -------------------------------------------------------------------------
   // Auto-run: navigate to next set, fill, submit
   // -------------------------------------------------------------------------
@@ -218,6 +234,28 @@ export default function AutoModeForm({ onClose }: AutoModeFormProps) {
   }
 
   async function resumeAutoRun() {
+    // Guard: prevent double-invocation (e.g. useEffect + manual Resume)
+    if (resumeRunningRef.current) return;
+    resumeRunningRef.current = true;
+    try {
+      await _doResumeAutoRun();
+    } catch (err) {
+      console.error('[ACE auto] resumeAutoRun error, forcing advance:', err);
+      // On unexpected error, still try to advance to the next set
+      const queue = getAutoQueue();
+      const idx   = getAutoCurrentIndex();
+      if (idx >= 0 && idx < queue.length) {
+        const nextIdx = idx + 1;
+        setAutoCurrentIndex(nextIdx);
+        if (nextIdx < queue.length) startNextSet(queue, nextIdx);
+        else { setStatus({ type: 'done', filled: 0, total: queue.length }); clearAutoQueue(); }
+      }
+    } finally {
+      resumeRunningRef.current = false;
+    }
+  }
+
+  async function _doResumeAutoRun() {
     const queue = getAutoQueue();
     const idx   = getAutoCurrentIndex();
     if (idx < 0 || idx >= queue.length) { clearAutoQueue(); return; }
@@ -225,7 +263,7 @@ export default function AutoModeForm({ onClose }: AutoModeFormProps) {
     const item = queue[idx];
     setStatus({ type: 'processing', setName: item.expansion, current: idx + 1, total: queue.length });
 
-    // Wait for DOM to settle
+    // Wait for CM's Vue.js to finish rendering table rows
     await new Promise(r => setTimeout(r, 600));
 
     // Fill all matching rows
@@ -263,7 +301,7 @@ export default function AutoModeForm({ onClose }: AutoModeFormProps) {
       filled++;
     }
 
-    // Mark done, advance queue
+    // Mark done, advance queue index in localStorage BEFORE any navigation
     queue[idx].done = true;
     const nextIdx = idx + 1;
     setAutoQueue(queue);
@@ -278,14 +316,26 @@ export default function AutoModeForm({ onClose }: AutoModeFormProps) {
     }
 
     if (filled === 0) {
-      // Nothing filled on this page — skip the form submit and move directly to next set
+      // Nothing to list on this page — skip form submit and move directly to next set
       startNextSet(queue, nextIdx);
       return;
     }
 
-    // Submit the CM form — page will reload and resumeAutoRun fires for the next set
-    await new Promise(r => setTimeout(r, 300));
+    // Submit the CM BulkListing form.
+    //
+    // CM may either:
+    //   (a) do a traditional POST+redirect (full page reload) — our content script
+    //       reinjects on the new page and resumeAutoRun picks up from localStorage.
+    //   (b) handle the submit via AJAX and update the DOM in-place (no page reload).
+    //
+    // We handle both: submit the form, then after 2.5 s check if we're still on this
+    // page. If the script is still alive (AJAX path), navigate to the next set ourselves.
+    // If CM did a real reload the script is already destroyed and the timeout never fires.
+    await new Promise(r => setTimeout(r, 800));
     submitBulkListingForm();
+    // Fallback for AJAX submission — navigate ourselves if page hasn't reloaded in 2.5 s
+    await new Promise(r => setTimeout(r, 2500));
+    startNextSet(queue, nextIdx);
   }
 
   // -------------------------------------------------------------------------
@@ -361,8 +411,16 @@ export default function AutoModeForm({ onClose }: AutoModeFormProps) {
             label={`${status.current}/${status.total}`}
             animated
           />
-          <div style={{ fontSize: '.85em', marginTop: '.25rem', color: '#555' }}>
-            Processing: <strong>{status.setName}</strong>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '.25rem' }}>
+            <div style={{ fontSize: '.85em', color: '#555', flex: 1 }}>
+              Processing: <strong>{status.setName}</strong>
+            </div>
+            <Button size="sm" variant="outline-secondary"
+              style={{ fontSize: '.75em', padding: '2px 8px', whiteSpace: 'nowrap' }}
+              onClick={handleSkipSet}
+              title="Stuck? Skip this set and move to the next one">
+              ⏭ Skip
+            </Button>
           </div>
         </div>
       )}
