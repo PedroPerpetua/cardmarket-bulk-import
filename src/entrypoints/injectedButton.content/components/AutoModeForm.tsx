@@ -31,6 +31,7 @@ import {
   getStoredExpansionMap,
   getStoredRarityMap,
   isAutoModeActive,
+  markListedInAce,
   normaliseQuotes,
   setAutoCurrentIndex,
   setAutoQueue,
@@ -135,6 +136,8 @@ export default function AutoModeForm({ onClose }: AutoModeFormProps) {
     const condCol   = headers.find(h => h.toLowerCase() === 'condition');
     const firstEdCol = headers.find(h => h.toLowerCase().match(/firstEd|first.edition/i));
     const commentCol = headers.find(h => h.toLowerCase().match(/comment/i));
+    // ACE_ID column: present only in extension-profile exports (?profile=extension)
+    const aceIdCol  = headers.find(h => h.toLowerCase() === 'ace_id');
 
     if (!expCol || !nameCol) {
       setStatus({ type: 'error', message: `CSV must have "Expansion" and "Name" columns. Found: ${headers.join(', ')}` });
@@ -184,6 +187,7 @@ export default function AutoModeForm({ onClose }: AutoModeFormProps) {
           condition: String(r[condCol!]      || 'NM').trim().toUpperCase(),
           isFirstEd: String(r[firstEdCol!]   || '').toLowerCase() === 'yes',
           comments:  String(r[commentCol!]   || ''),
+          aceId:     aceIdCol ? Number(r[aceIdCol] || 0) : 0,
         })),
       });
     }
@@ -269,6 +273,7 @@ export default function AutoModeForm({ onClose }: AutoModeFormProps) {
     // Fill all matching rows
     const websiteRows = getWebsiteRows();
     let filled = 0;
+    const filledAceIds: number[] = [];
     for (const row of item.rows) {
       const anchor = websiteRows.find(el => compareNormalized(el.textContent, row.name));
       if (!anchor) continue;
@@ -298,6 +303,7 @@ export default function AutoModeForm({ onClose }: AutoModeFormProps) {
       if (firstEdEl) setChecked(firstEdEl, row.isFirstEd);
       if (commentsEl && row.comments) setInputValue(commentsEl, row.comments);
 
+      if (row.aceId > 0) filledAceIds.push(row.aceId);
       filled++;
     }
 
@@ -320,6 +326,13 @@ export default function AutoModeForm({ onClose }: AutoModeFormProps) {
       startNextSet(queue, nextIdx);
       return;
     }
+
+    // Mark cards as listed in ACE BEFORE submitting the form.
+    // Using keepalive:true so the request completes even if CM does a
+    // full-page POST+redirect (which destroys the current script context).
+    const aceUrl   = localStorage.getItem('ace_base_url') || '';
+    const aceToken = localStorage.getItem('ace_cm_token')  || '';
+    markListedInAce(filledAceIds, aceUrl, aceToken);
 
     // Submit the CM BulkListing form.
     //

@@ -86,6 +86,7 @@ export type AutoQueueItem = {
     condition:  string;
     isFirstEd:  boolean;
     comments:   string;
+    aceId:      number;  // owned_card.id (0 = not available / old export without ACE_ID col)
   }>;
   done: boolean;
 };
@@ -141,4 +142,35 @@ export function dominantRarity(names: string[]): string | null {
     if (r) return r;
   }
   return null;
+}
+
+/**
+ * Tell ACE that the given owned_card IDs have been listed on Cardmarket.
+ * ACE will mark them as 'listed' so they are excluded from future exports.
+ *
+ * Uses keepalive:true so the request survives a page navigation (the CM form
+ * submission causes a page reload, but we fire this request beforehand and
+ * keepalive ensures it completes even if the page unloads mid-flight).
+ *
+ * Silently ignores errors — listing has already succeeded on CM; failing to
+ * mark in ACE is recoverable (the user can re-export and skip already-listed
+ * cards manually, or just note the duplicate).
+ */
+export async function markListedInAce(
+  ids: number[],
+  aceBaseUrl: string,
+  token: string,
+): Promise<void> {
+  const validIds = ids.filter(id => id > 0);
+  if (!validIds.length || !aceBaseUrl || !token) return;
+  try {
+    await fetch(`${aceBaseUrl}/api/inventory/bulk-mark-listed`, {
+      method:    'POST',
+      keepalive: true,   // survives page unload
+      headers:   { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      body:      JSON.stringify({ ids: validIds }),
+    });
+  } catch (e) {
+    console.warn('[ACE] markListedInAce failed (non-fatal):', e);
+  }
 }
