@@ -93,26 +93,25 @@ export function readRarityMap(): Record<string, number> {
 
 /** Apply expansion + rarity filter and submit the GET form. Returns true if navigating. */
 export function applyBulkListingFilter(idExpansion: number, idRarity: number): boolean {
-  const expSel    = document.querySelector<HTMLSelectElement>('select[name="idExpansion"]');
-  const rarSel    = document.querySelector<HTMLSelectElement>('select[name="idRarity"]');
-  const filterBtn = document.querySelector<HTMLButtonElement>(
-    'button.btn-primary[type="submit"], button.btn-primary'
-  );
-  if (!expSel || !rarSel || !filterBtn) return false;
-
-  expSel.value = String(idExpansion);
-  expSel.dispatchEvent(new Event('change', { bubbles: true }));
-  rarSel.value = String(idRarity);
-  rarSel.dispatchEvent(new Event('change', { bubbles: true }));
-  filterBtn.click();
+  // CM BulkListing uses GET-form URL navigation — build the URL directly
+  // rather than trying to find and click the Filter button (which has
+  // inconsistent selectors across CM page states).
+  const base = '/en/YuGiOh/Stock/ListingMethods/BulkListing';
+  const params = new URLSearchParams({ idExpansion: String(idExpansion), sortBy: 'cn_asc' });
+  if (idRarity) params.set('idRarity', String(idRarity));
+  window.location.href = `${base}?${params.toString()}`;
   return true;
 }
 
-/** Submit the CM BulkListing Add-to-Stock POST form. */
+/** Submit the CM BulkListing Add-to-Stock POST form.
+ *
+ *  CM renders an <input type="submit" value="Put Card(s) On Sale" form="BulkListingForm">
+ *  that is OUTSIDE the <form> tag but associated via the HTML `form` attribute.
+ *  Clicking it submits all filled rows in BulkListingForm.
+ */
 export function submitBulkListingForm(): boolean {
-  // The "Add to Stock" button is a submit button in the main POST form
-  const submitBtn = document.querySelector<HTMLButtonElement>(
-    'form[method="post"] button[type="submit"]:not(.btn-secondary)'
+  const submitBtn = document.querySelector<HTMLInputElement>(
+    'input[value="Put Card(s) On Sale"], input[type="submit"].btn-primary:not([value="Filter"])'
   );
   if (submitBtn) { submitBtn.click(); return true; }
   return false;

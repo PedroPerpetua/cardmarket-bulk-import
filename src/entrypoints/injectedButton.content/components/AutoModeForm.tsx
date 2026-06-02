@@ -70,10 +70,16 @@ export default function AutoModeForm({ onClose }: AutoModeFormProps) {
   const [isSynced, setIsSynced]   = useState(() => isAutoModeActive() || Object.keys(getStoredExpansionMap()).length > 0);
   const fileRef = useRef<HTMLInputElement>(null);
 
-  // On mount: check if we're resuming an auto-run after a page reload
+  // On mount: resume an in-progress run, or show "previous run done" message
   useEffect(() => {
-    if (!isAutoModeActive()) return;
-    resumeAutoRun();
+    if (isAutoModeActive()) {
+      resumeAutoRun();
+    } else if (getAutoCurrentIndex() > 0) {
+      // Queue is cleared but current > 0 → previous run completed
+      setStatus({ type: 'done', filled: 0, total: getAutoCurrentIndex() });
+      // Reset the index so this message only shows once
+      setAutoCurrentIndex(-1);
+    }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -238,7 +244,10 @@ export default function AutoModeForm({ onClose }: AutoModeFormProps) {
       const firstEdEl = trEl.querySelector<HTMLInputElement>(firstEdElSelector);
       const commentsEl = trEl.querySelector<HTMLInputElement>(commentsElSelector);
 
-      if (qtyEl)   setInputValue(qtyEl, String(row.quantity));
+      // Skip rows with no price — CM won't list at €0 anyway
+      if (!row.price || row.price <= 0) continue;
+
+      if (qtyEl)   setInputValue(qtyEl, String(row.quantity || 1));
       if (priceEl) setInputValue(priceEl, row.price.toFixed(2));
       if (langEl) {
         const lang = matchLanguage(row.language);
@@ -260,17 +269,23 @@ export default function AutoModeForm({ onClose }: AutoModeFormProps) {
     setAutoQueue(queue);
     setAutoCurrentIndex(nextIdx);
 
-    // Submit the CM form, then move to next set
-    await new Promise(r => setTimeout(r, 300));
-    const submitted = submitBulkListingForm();
-
-    if (!submitted || nextIdx >= queue.length) {
-      // Last set or couldn't submit — show done
+    if (nextIdx >= queue.length) {
+      // Last set — show done regardless of whether we filled anything
       const totalFilled = queue.reduce((s, q) => s + (q.done ? q.rows.length : 0), 0);
       setStatus({ type: 'done', filled: totalFilled, total: queue.length });
       clearAutoQueue();
+      return;
     }
-    // else: the form submit triggers a page reload → on next load, resumeAutoRun fires again
+
+    if (filled === 0) {
+      // Nothing filled on this page — skip the form submit and move directly to next set
+      startNextSet(queue, nextIdx);
+      return;
+    }
+
+    // Submit the CM form — page will reload and resumeAutoRun fires for the next set
+    await new Promise(r => setTimeout(r, 300));
+    submitBulkListingForm();
   }
 
   // -------------------------------------------------------------------------
@@ -354,7 +369,11 @@ export default function AutoModeForm({ onClose }: AutoModeFormProps) {
 
       {status.type === 'done' && (
         <Alert variant="success" className="mb-0">
-          ✓ Done — {status.filled} cards across {status.total} sets listed.
+          ✓ Previous run complete — processed {status.total} sets.
+          {status.filled > 0 && <> {status.filled} card rows were submitted.</>}
+          <div style={{ fontSize: '.8em', marginTop: '.25rem' }}>
+            Upload a new flat CSV above to start another run.
+          </div>
           {status.skipped && status.skipped.length > 0 && (
             <div style={{ fontSize: '.8em', marginTop: '.25rem', color: '#856404' }}>
               ⚠ {status.skipped.length} set(s) skipped (not on CM): {status.skipped.join(', ')}
@@ -383,8 +402,8 @@ export default function AutoModeForm({ onClose }: AutoModeFormProps) {
         </div>
       )}
 
-      <Button variant="outline-secondary" size="sm" onClick={onClose}
-        style={{ color: '#666', borderColor: '#999', background: 'transparent' }}>
+      <Button size="sm" onClick={onClose}
+        style={{ color: '#fff', background: '#6c757d', border: '1px solid #6c757d', width: '100%' }}>
         Close
       </Button>
     </Stack>
