@@ -31,6 +31,7 @@ import {
   getStoredExpansionMap,
   getStoredRarityMap,
   isAutoModeActive,
+  learnProductIds,
   markListedInAce,
   normaliseQuotes,
   setAutoCurrentIndex,
@@ -137,7 +138,9 @@ export default function AutoModeForm({ onClose }: AutoModeFormProps) {
     const firstEdCol = headers.find(h => h.toLowerCase().match(/firstEd|first.edition/i));
     const commentCol = headers.find(h => h.toLowerCase().match(/comment/i));
     // ACE_ID column: present only in extension-profile exports (?profile=extension)
-    const aceIdCol  = headers.find(h => h.toLowerCase() === 'ace_id');
+    const aceIdCol       = headers.find(h => h.toLowerCase() === 'ace_id');
+    // CM_Product_ID column: present in extension-profile exports; enables exact idProduct matching
+    const cmProductIdCol = headers.find(h => h.toLowerCase() === 'cm_product_id');
 
     if (!expCol || !nameCol) {
       setStatus({ type: 'error', message: `CSV must have "Expansion" and "Name" columns. Found: ${headers.join(', ')}` });
@@ -180,14 +183,15 @@ export default function AutoModeForm({ onClose }: AutoModeFormProps) {
         rarityLabel,
         done: false,
         rows: rows.map(r => ({
-          name:      String(r[nameCol!]      || ''),
-          quantity:  Number(r[qtyCol!]       || 0),
-          price:     Number(r[priceCol!]     || 0),
-          language:  String(r[langCol!]      || 'English'),
-          condition: String(r[condCol!]      || 'NM').trim().toUpperCase(),
-          isFirstEd: String(r[firstEdCol!]   || '').toLowerCase() === 'yes',
-          comments:  String(r[commentCol!]   || ''),
-          aceId:     aceIdCol ? Number(r[aceIdCol] || 0) : 0,
+          name:        String(r[nameCol!]        || ''),
+          quantity:    Number(r[qtyCol!]         || 0),
+          price:       Number(r[priceCol!]       || 0),
+          language:    String(r[langCol!]        || 'English'),
+          condition:   String(r[condCol!]        || 'NM').trim().toUpperCase(),
+          isFirstEd:   String(r[firstEdCol!]     || '').toLowerCase() === 'yes',
+          comments:    String(r[commentCol!]     || ''),
+          aceId:       aceIdCol       ? Number(r[aceIdCol]       || 0) : 0,
+          cmProductId: cmProductIdCol ? Number(r[cmProductIdCol] || 0) : 0,
         })),
       });
     }
@@ -270,25 +274,55 @@ export default function AutoModeForm({ onClose }: AutoModeFormProps) {
     // Wait for CM's Vue.js to finish rendering table rows
     await new Promise(r => setTimeout(r, 600));
 
+    // Build a map of CM idProduct → TR element from hidden inputs in the page.
+    // CM's BulkListing form has an input like <input name="idProduct[N]" value="XXXXX">
+    // in each row — we use this for exact matching when CM_Product_ID is known.
+    const productIdToRow = new Map<string, HTMLTableRowElement>();
+    document.querySelectorAll<HTMLTableRowElement>('tr').forEach(tr => {
+      const pidInput = tr.querySelector<HTMLInputElement>('input[name^="idProduct"]');
+      if (pidInput?.value) productIdToRow.set(pidInput.value, tr);
+    });
+
     // Fill all matching rows
     const websiteRows = getWebsiteRows();
     let filled = 0;
     const filledAceIds: number[] = [];
+    // Mappings discovered during this run: rows where cmProductId was 0 but we found a real one
+    const learnedMappings: Array<{ aceId: number; cmProductId: number }> = [];
+
     for (const row of item.rows) {
-      const anchor = websiteRows.find(el => compareNormalized(el.textContent, row.name));
-      if (!anchor) continue;
-      const trEl = anchor.closest('tr') as HTMLTableRowElement | null;
-      if (!trEl) continue;
-
-      const qtyEl  = trEl.querySelector<HTMLInputElement>(quantityElSelector);
-      const priceEl = trEl.querySelector<HTMLInputElement>(priceElSelector);
-      const langEl  = trEl.querySelector<HTMLSelectElement>(languageElSelector);
-      const condEl  = trEl.querySelector<HTMLSelectElement>(conditionElSelector);
-      const firstEdEl = trEl.querySelector<HTMLInputElement>(firstEdElSelector);
-      const commentsEl = trEl.querySelector<HTMLInputElement>(commentsElSelector);
-
       // Skip rows with no price — CM won't list at €0 anyway
       if (!row.price || row.price <= 0) continue;
+
+      // Priority 1: exact idProduct match (works for multi-rarity sets like Rarity Collection)
+      // Priority 2: card name fuzzy match (original method, fallback)
+      let trEl: HTMLTableRowElement | null = null;
+
+      if (row.cmProductId > 0) {
+        trEl = productIdToRow.get(String(row.cmProductId)) ?? null;
+      }
+
+      if (!trEl) {
+        const anchor = websiteRows.find(el => compareNormalized(el.textContent, row.name));
+        trEl = anchor?.closest('tr') as HTMLTableRowElement | null;
+
+        // If we matched by name but didn't know the product ID, learn it now
+        if (trEl && row.aceId > 0 && row.cmProductId === 0) {
+          const pidInput = trEl.querySelector<HTMLInputElement>('input[name^="idProduct"]');
+          if (pidInput?.value) {
+            learnedMappings.push({ aceId: row.aceId, cmProductId: parseInt(pidInput.value, 10) });
+          }
+        }
+      }
+
+      if (!trEl) continue;
+
+      const qtyEl      = trEl.querySelector<HTMLInputElement>(quantityElSelector);
+      const priceEl    = trEl.querySelector<HTMLInputElement>(priceElSelector);
+      const langEl     = trEl.querySelector<HTMLSelectElement>(languageElSelector);
+      const condEl     = trEl.querySelector<HTMLSelectElement>(conditionElSelector);
+      const firstEdEl  = trEl.querySelector<HTMLInputElement>(firstEdElSelector);
+      const commentsEl = trEl.querySelector<HTMLInputElement>(commentsElSelector);
 
       if (qtyEl)   setInputValue(qtyEl, String(row.quantity || 1));
       if (priceEl) setInputValue(priceEl, row.price.toFixed(2));
@@ -327,12 +361,15 @@ export default function AutoModeForm({ onClose }: AutoModeFormProps) {
       return;
     }
 
-    // Mark cards as listed in ACE BEFORE submitting the form.
-    // Using keepalive:true so the request completes even if CM does a
-    // full-page POST+redirect (which destroys the current script context).
+    // Notify ACE BEFORE submitting the form (keepalive:true survives the page unload).
+    //
+    // 1. Mark cards as listed so they're excluded from future exports.
+    // 2. Report any newly learned (aceId → cmProductId) mappings so future exports
+    //    will use exact idProduct matching for those cards.
     const aceUrl   = localStorage.getItem('ace_base_url') || '';
     const aceToken = localStorage.getItem('ace_cm_token')  || '';
     markListedInAce(filledAceIds, aceUrl, aceToken);
+    if (learnedMappings.length > 0) learnProductIds(learnedMappings, aceUrl, aceToken);
 
     // Submit the CM BulkListing form.
     //

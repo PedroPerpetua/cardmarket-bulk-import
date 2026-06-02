@@ -79,14 +79,15 @@ export type AutoQueueItem = {
   idRarity:    number;   // 0 = All
   rarityLabel: string;   // for display
   rows: Array<{
-    name:       string;
-    quantity:   number;
-    price:      number;
-    language:   string;
-    condition:  string;
-    isFirstEd:  boolean;
-    comments:   string;
-    aceId:      number;  // owned_card.id (0 = not available / old export without ACE_ID col)
+    name:        string;
+    quantity:    number;
+    price:       number;
+    language:    string;
+    condition:   string;
+    isFirstEd:   boolean;
+    comments:    string;
+    aceId:       number;  // owned_card.id (0 = not available / old export without ACE_ID col)
+    cmProductId: number;  // CM idProduct (0 = unmatched / old export without CM_Product_ID col)
   }>;
   done: boolean;
 };
@@ -156,6 +157,35 @@ export function dominantRarity(names: string[]): string | null {
  * mark in ACE is recoverable (the user can re-export and skip already-listed
  * cards manually, or just note the duplicate).
  */
+/**
+ * Report confirmed (aceId, cmProductId) mappings observed during auto-fill.
+ *
+ * When the extension fills a BulkListing row whose cmProductId was 0 (unknown),
+ * it can read the actual idProduct from CM's hidden form input and report it here.
+ * ACE stores the ground-truth mapping on the ygo_printing so future exports
+ * include the correct CM_Product_ID — progressively self-healing the match rate.
+ *
+ * Fire-and-forget: uses keepalive so it survives page navigation.
+ */
+export async function learnProductIds(
+  mappings: Array<{ aceId: number; cmProductId: number }>,
+  aceBaseUrl: string,
+  token: string,
+): Promise<void> {
+  const valid = mappings.filter(m => m.aceId > 0 && m.cmProductId > 0);
+  if (!valid.length || !aceBaseUrl || !token) return;
+  try {
+    await fetch(`${aceBaseUrl}/api/inventory/learn-product-ids`, {
+      method:    'POST',
+      keepalive: true,
+      headers:   { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      body:      JSON.stringify({ mappings: valid.map(m => ({ ace_id: m.aceId, cm_product_id: m.cmProductId })) }),
+    });
+  } catch (e) {
+    console.warn('[ACE] learnProductIds failed (non-fatal):', e);
+  }
+}
+
 export async function markListedInAce(
   ids: number[],
   aceBaseUrl: string,
