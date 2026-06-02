@@ -1,4 +1,4 @@
-import { useState, i18n } from '#imports';
+import { useState, useEffect, i18n } from '#imports';
 
 import { Button, Modal, Image, Stack } from 'react-bootstrap';
 import { createPortal } from 'react-dom';
@@ -10,6 +10,7 @@ import SuccessAlert from './components/SuccessAlert';
 import type { ParsedRow } from './game-manager';
 import useGameManager from './game-manager/useGameManager';
 import IconTransparent from '../../assets/icon-transparent.png';
+import { isAutoModeActive } from '../../utils/cmMapping';
 
 type AppMode = 'import' | 'auto';
 
@@ -19,6 +20,15 @@ function App() {
   const [importedRows, setImportedRows] = useState<ParsedRow[] | null>(null);
   const [filledCount, setFilledCount]   = useState<number | null>(null);
   const gameManager = useGameManager();
+
+  // After a page reload triggered by applyBulkListingFilter, auto-reopen the
+  // Auto Import modal so resumeAutoRun() fires inside AutoModeForm.
+  useEffect(() => {
+    if (isAutoModeActive()) {
+      setMode('auto');
+      setShow(true);
+    }
+  }, []);
 
   function openImport() {
     setMode('import');

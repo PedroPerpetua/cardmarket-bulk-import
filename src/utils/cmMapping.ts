@@ -8,6 +8,14 @@
 export type CmExpansionMap = Record<string, number>;  // set_name  → idExpansion
 export type CmRarityMap    = Record<string, number>;  // rarity    → idRarity
 
+/** Normalise typographic quotes/apostrophes to ASCII equivalents so that
+ *  ACE set names (straight quotes) match CM dropdown names (curly quotes). */
+export function normaliseQuotes(s: string): string {
+  return s
+    .replace(/[‘’ʼ]/g, "'")   // ' ' ʼ  → '
+    .replace(/[“”]/g, '"');          // " "    → "
+}
+
 const LS_EXPANSIONS = 'ace_cm_expansion_map';
 const LS_RARITIES   = 'ace_cm_rarity_map';
 

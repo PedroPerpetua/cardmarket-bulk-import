@@ -31,6 +31,7 @@ import {
   getStoredExpansionMap,
   getStoredRarityMap,
   isAutoModeActive,
+  normaliseQuotes,
   setAutoCurrentIndex,
   setAutoQueue,
   storeExpansionMap,
@@ -54,8 +55,8 @@ type AutoStatus =
   | { type: 'idle' }
   | { type: 'syncing' }
   | { type: 'synced'; message: string }
-  | { type: 'processing'; setName: string; current: number; total: number }
-  | { type: 'done'; filled: number; total: number }
+  | { type: 'processing'; setName: string; current: number; total: number; skipped?: string[] }
+  | { type: 'done'; filled: number; total: number; skipped?: string[] }
   | { type: 'error'; message: string };
 
 export default function AutoModeForm({ onClose }: AutoModeFormProps) {
@@ -117,7 +118,7 @@ export default function AutoModeForm({ onClose }: AutoModeFormProps) {
     }
 
     // Detect column names (flat CSV has Expansion as first col)
-    const headers = data.headers;
+    const headers = data.columns;
     const expCol  = headers.find(h => h.toLowerCase().includes('expansion'));
     const nameCol = headers.find(h => h.toLowerCase() === 'name');
     const qtyCol  = headers.find(h => h.toLowerCase().match(/quantity|count/));
@@ -147,8 +148,14 @@ export default function AutoModeForm({ onClose }: AutoModeFormProps) {
     const queue: AutoQueueItem[] = [];
     const missing: string[] = [];
 
+    // Build a normalised lookup (curly quotes → straight) so ACE names match CM names
+    const normExpansionMap: Record<string, number> = {};
+    for (const [k, v] of Object.entries(expansionMap)) {
+      normExpansionMap[normaliseQuotes(k)] = v;
+    }
+
     for (const [expansion, rows] of byExpansion) {
-      const idExpansion = expansionMap[expansion];
+      const idExpansion = expansionMap[expansion] ?? normExpansionMap[normaliseQuotes(expansion)];
       if (!idExpansion) { missing.push(expansion); continue; }
 
       const cardNames   = rows.map(r => String(r[nameCol!] || ''));
@@ -173,36 +180,33 @@ export default function AutoModeForm({ onClose }: AutoModeFormProps) {
       });
     }
 
-    if (missing.length) {
+    if (!queue.length) {
       setStatus({
         type: 'error',
-        message: `${missing.length} set(s) not in expansion map: ${missing.slice(0, 3).join(', ')}${missing.length > 3 ? '…' : ''}. Click "Sync CM Maps" first.`,
+        message: missing.length
+          ? `No sets matched the expansion map. Missing: ${missing.slice(0, 5).join(', ')}${missing.length > 5 ? '…' : ''}. Try re-syncing CM Maps.`
+          : 'No processable sets found in CSV.',
       });
-      return;
-    }
-
-    if (!queue.length) {
-      setStatus({ type: 'error', message: 'No processable sets found in CSV.' });
       return;
     }
 
     setAutoQueue(queue);
     setAutoCurrentIndex(0);
-    startNextSet(queue, 0);
+    startNextSet(queue, 0, missing);
   }
 
   // -------------------------------------------------------------------------
   // Auto-run: navigate to next set, fill, submit
   // -------------------------------------------------------------------------
-  function startNextSet(queue: AutoQueueItem[], idx: number) {
+  function startNextSet(queue: AutoQueueItem[], idx: number, skipped: string[] = []) {
     if (idx >= queue.length) {
       const filled = queue.reduce((s, q) => s + q.rows.length, 0);
-      setStatus({ type: 'done', filled, total: queue.length });
+      setStatus({ type: 'done', filled, total: queue.length, skipped });
       clearAutoQueue();
       return;
     }
     const item = queue[idx];
-    setStatus({ type: 'processing', setName: item.expansion, current: idx + 1, total: queue.length });
+    setStatus({ type: 'processing', setName: item.expansion, current: idx + 1, total: queue.length, skipped });
     // Navigate → page reload → resumeAutoRun picks up
     applyBulkListingFilter(item.idExpansion, item.idRarity);
   }
@@ -294,7 +298,7 @@ export default function AutoModeForm({ onClose }: AutoModeFormProps) {
           <Form.Control
             size="sm"
             type="password"
-            placeholder="ACE token (from browser dev tools → Application → localStorage → ace_token)"
+            placeholder="ACE token — get it from: ace.belfast.moe/api/auth/token (must be logged in)"
             value={aceToken}
             onChange={e => setAceToken(e.target.value)}
           />
@@ -351,6 +355,11 @@ export default function AutoModeForm({ onClose }: AutoModeFormProps) {
       {status.type === 'done' && (
         <Alert variant="success" className="mb-0">
           ✓ Done — {status.filled} cards across {status.total} sets listed.
+          {status.skipped && status.skipped.length > 0 && (
+            <div style={{ fontSize: '.8em', marginTop: '.25rem', color: '#856404' }}>
+              ⚠ {status.skipped.length} set(s) skipped (not on CM): {status.skipped.join(', ')}
+            </div>
+          )}
         </Alert>
       )}
 
@@ -374,7 +383,10 @@ export default function AutoModeForm({ onClose }: AutoModeFormProps) {
         </div>
       )}
 
-      <Button variant="outline-secondary" size="sm" onClick={onClose}>Close</Button>
+      <Button variant="outline-secondary" size="sm" onClick={onClose}
+        style={{ color: '#666', borderColor: '#999', background: 'transparent' }}>
+        Close
+      </Button>
     </Stack>
   );
 }

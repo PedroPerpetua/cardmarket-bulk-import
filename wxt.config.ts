@@ -11,6 +11,10 @@ export default defineConfig({
   manifest: {
     name: 'Cardmarket Bulk Import',
     default_locale: 'en',
+    // host_permissions allows content scripts to make cross-origin fetch requests
+    // to ACE without CORS preflight failures.  WXT converts these to the correct
+    // format for MV2 (Firefox) vs MV3 (Chrome) automatically.
+    host_permissions: ['https://ace.belfast.moe/*'],
   },
   zip: {
     sourcesRoot: 'src',
