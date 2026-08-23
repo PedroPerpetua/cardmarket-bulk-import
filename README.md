@@ -34,6 +34,36 @@ My recommendation is to split your CSVs by expansion, and then importing each ra
 The entire code is open source and you can verify it here; you can even clone this repository and launch it yourself locally if you don't trust the store version.
 
 
+## Running it locally as an unpacked extension
+
+If you'd rather run your own build than install from the stores - to try unreleased changes, or just to verify the code yourself - you can load it into Chrome as an unpacked extension.
+
+You'll need [Node.js](https://nodejs.org) and Yarn; the exact versions this project expects are pinned under `engines` in `package.json`. Yarn 4 ships through Corepack, so `corepack enable` is usually all it takes to get the right version.
+
+```bash
+git clone https://github.com/ThijmenL98/cardmarket-bulk-import
+cd cardmarket-bulk-import
+yarn install
+yarn build
+```
+
+That leaves you a complete extension in `.output/chrome-mv3`. To load it:
+
+1. Open `chrome://extensions` and turn on **Developer mode** (top right).
+2. Click **Load unpacked** and select the `.output/chrome-mv3` folder.
+3. Open any Cardmarket bulk listing page - the import button is injected into the form.
+
+For Firefox, `yarn build:firefox` writes to `.output/firefox-mv2`, which you can load through `about:debugging` > **This Firefox** > **Load Temporary Add-on** by picking its `manifest.json`.
+
+### While developing
+
+`yarn dev` is nicer than rebuilding by hand: it launches a fresh browser with the extension already loaded and reloads it as you edit. Use `yarn dev:firefox` for Firefox.
+
+If you do use `yarn build`, note that Chrome won't pick up changes on its own - hit the reload icon on the extension's card in `chrome://extensions` after each build. Unpacked extensions also don't auto-update, and Chrome will warn about developer mode extensions on startup; both are expected, and neither applies to the store builds.
+
+`yarn zip` packages the build into `.output/` if you want to move it to another machine. Bear in mind Chrome can't install a zip directly - unpack it first, then load the folder.
+
+
 ## Roadmap & Contributions
 I have improvements planned when I find the time to work on them! Check the [TODO](docs/TODO.md) file for the planned upgrades.
 
