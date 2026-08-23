@@ -163,7 +163,7 @@ class GenericGameManager<
       isReverseHolo: !!columnMapping.isReverseHolo
         && parseBoolean(
           String(rawRowData[columnMapping.isReverseHolo]),
-          ['reverse', 'reverse holo', 'reverseholo', 'reverse_holo', 'rh', 'holo'],
+          ['reverse', 'reverse holo', 'reverseholo', 'reverse_holo', 'rh'],
         ),
       comment: columnMapping.comment ? String(rawRowData[columnMapping.comment]) : '',
       quantity: columnMapping.quantity ? (Number(rawRowData[columnMapping.quantity]) || 0) : 0,
