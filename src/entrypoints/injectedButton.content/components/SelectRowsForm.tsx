@@ -146,6 +146,9 @@ function SelectRowsForm({ rows, onSubmit }: SelectRowsFormProps) {
                 { i18n.t('injectedButton.gameManagers.common.selectRowsFormTable.isSigned') }
               </th>
               <th className="col">
+                { i18n.t('injectedButton.gameManagers.common.selectRowsFormTable.isReverseHolo') }
+              </th>
+              <th className="col">
                 { i18n.t('injectedButton.gameManagers.common.selectRowsFormTable.comment') }
               </th>
               <th className="col">
@@ -243,6 +246,7 @@ function SelectRowsForm({ rows, onSubmit }: SelectRowsFormProps) {
                       })
                   }
                   <td><Checkmark value={r.isSigned} /></td>
+                  <td><Checkmark value={r.isReverseHolo} /></td>
                   <td>
                     {
                       r.comment && (

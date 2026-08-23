@@ -18,6 +18,7 @@ type BaseImportFormValues = {
   language: string | undefined,
   condition: string | undefined,
   isSigned: string | undefined,
+  isReverseHolo: string | undefined,
   comment: string | undefined,
   quantity: string | undefined,
   price: string | undefined,
@@ -31,6 +32,7 @@ const baseValidationSchema: yup.ObjectSchema<BaseImportFormValues> = yup.object(
   language: yup.string(),
   condition: yup.string(),
   isSigned: yup.string(),
+  isReverseHolo: yup.string(),
   comment: yup.string(),
   quantity: yup.string(),
   price: yup.string(),
@@ -116,6 +118,13 @@ function ImportCsvForm({ onSubmit }: ImportCsvFormProps) {
         formId="importCsvForm.isSigned"
         name="isSigned"
         label={i18n.t('injectedButton.gameManagers.common.importCsvForm.isSigned.label')}
+        options={csvColumns}
+      />
+      <ColumnSelect
+        control={control}
+        formId="importCsvForm.isReverseHolo"
+        name="isReverseHolo"
+        label={i18n.t('injectedButton.gameManagers.common.importCsvForm.isReverseHolo.label')}
         options={csvColumns}
       />
       <ColumnSelect

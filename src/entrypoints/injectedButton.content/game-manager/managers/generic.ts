@@ -13,6 +13,7 @@ import {
   languageElSelector,
   priceElSelector,
   quantityElSelector,
+  reverseHoloElSelector,
   signedElSelector,
 } from '../utils/html';
 import { matchLanguage } from '../utils/language';
@@ -23,6 +24,7 @@ export type BaseColumnMapping = {
   language: string | undefined,
   condition: string | undefined,
   isSigned: string | undefined,
+  isReverseHolo: string | undefined,
   comment: string | undefined,
   quantity: string | undefined,
   price: string | undefined,
@@ -43,6 +45,7 @@ export type CommonParsedRowFields = {
     data: ConditionData,
   },
   isSigned: boolean,
+  isReverseHolo: boolean,
   comment: string,
   quantity: number,
   price: number,
@@ -157,6 +160,11 @@ class GenericGameManager<
       condition,
       isSigned: !!columnMapping.isSigned
         && parseBoolean(String(rawRowData[columnMapping.isSigned]), ['signed']),
+      isReverseHolo: !!columnMapping.isReverseHolo
+        && parseBoolean(
+          String(rawRowData[columnMapping.isReverseHolo]),
+          ['reverse', 'reverse holo', 'reverseholo', 'reverse_holo', 'rh', 'holo'],
+        ),
       comment: columnMapping.comment ? String(rawRowData[columnMapping.comment]) : '',
       quantity: columnMapping.quantity ? (Number(rawRowData[columnMapping.quantity]) || 0) : 0,
       price: columnMapping.price ? (Number(rawRowData[columnMapping.price]) || 0) : 0,
@@ -220,6 +228,8 @@ class GenericGameManager<
       conditionEl.value = conditionEl.options[1].value; // 1 for NM default
       signedEl = resolvedEl.querySelector(signedElSelector)!;
       signedEl.value = signedEl.defaultValue;
+      const clonedReverseHoloEl = resolvedEl.querySelector(reverseHoloElSelector);
+      if (clonedReverseHoloEl instanceof HTMLInputElement) clonedReverseHoloEl.checked = false;
       commentEl = resolvedEl.querySelector(commentElSelector)!;
       commentEl.value = commentEl.defaultValue;
       quantityEl = resolvedEl.querySelector(quantityElSelector)!;
@@ -234,6 +244,10 @@ class GenericGameManager<
     commentEl.value = row.comment;
     quantityEl.value = row.quantity.toString();
     priceEl.value = row.price.toFixed(2);
+    // Reverse holo is game-dependent: only Pokemon rows render the checkbox. Query it
+    // from resolvedEl (the possibly-duplicated row) and skip games that don't have it.
+    const reverseHoloEl = resolvedEl.querySelector(reverseHoloElSelector);
+    if (reverseHoloEl instanceof HTMLInputElement) reverseHoloEl.checked = row.isReverseHolo;
 
     return Promise.resolve(resolvedEl);
   }

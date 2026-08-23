@@ -80,6 +80,9 @@
                     "isSigned": {
                         "label": "Signed Column"
                     },
+                    "isReverseHolo": {
+                        "label": "Reverse Holo Column"
+                    },
                     "comment": {
                         "label": "Comment Column"
                     },
@@ -96,6 +99,7 @@
                     "language": "Language",
                     "condition": "Condition",
                     "isSigned": "Signed",
+                    "isReverseHolo": "Reverse Holo",
                     "comment": "Comment",
                     "quantity": "Quantity",
                     "price": "Price"
