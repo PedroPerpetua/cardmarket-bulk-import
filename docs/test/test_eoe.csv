@@ -1,23 +1,30 @@
-Name,Set code,Foil,Rarity,Quantity,Purchase price,Condition,Language,Comment
-Banishing Light,EOE,normal,common,1,0.02,near_mint,en,Regular
-Banishing Light,EOE,normal,common,1,0.02,mint,en,Mint
-Banishing Light,EOE,normal,common,1,0.02,excellent,en,Excellent
-Banishing Light,EOE,normal,common,1,0.02,good,en,Good
-Banishing Light,EOE,normal,common,1,0.02,light_played,en,Lightly Played
-Banishing Light,EOE,normal,common,1,0.02,played,en,Played
-Banishing Light,EOE,normal,common,1,0.02,poor,en,Poor
-Banishing Light,EOE,t,common,1,0.02,near_mint,en,Foil (t)
-Banishing Light,EOE,true,common,1,0.02,near_mint,en,Foil (true)
-Banishing Light,EOE,1,common,1,0.02,near_mint,en,Foil (1)
-Banishing Light,EOE,y,common,1,0.02,near_mint,en,Foil (y)
-Banishing Light,EOE,yes,common,1,0.02,near_mint,en,Foil (yes)
-Banishing Light,EOE,normal,common,1,0.02,near_mint,fr,French
-Banishing Light,EOE,normal,common,1,0.02,near_mint,de,German
-Banishing Light,EOE,normal,common,1,0.02,near_mint,es,Spanish
-Banishing Light,EOE,normal,common,1,0.02,near_mint,it,Italian
-Banishing Light,EOE,normal,common,1,0.02,near_mint,ja,Japanese
-"Tezzeret, Cruel Captain",EOE,normal,mythic,1,0.02,near_mint,en,"Mythic, comma"
-Anticausal Vestige,EOE,normal,rare,1,0.02,near_mint,en,Rare
-All-Fates Stalker,EOE,normal,uncommon,1,0.02,near_mint,en,Uncommon
-Banishing Light,BLB,normal,common,1,0.02,near_mint,en,Different set
-Abandon Hope,TMP,normal,uncommon,1,0.02,near_mint,en,Unrelated card
+Name,Set code,Foil,Signed,Rarity,Quantity,Purchase price,Condition,Language,Comment
+Banishing Light,EOE,normal,no,common,1,0.02,near_mint,en,Regular
+Banishing Light,EOE,normal,no,common,1,0.02,mint,en,Mint
+Banishing Light,EOE,normal,no,common,1,0.02,excellent,en,Excellent
+Banishing Light,EOE,normal,no,common,1,0.02,good,en,Good
+Banishing Light,EOE,normal,no,common,1,0.02,light_played,en,Lightly Played
+Banishing Light,EOE,normal,no,common,1,0.02,played,en,Played
+Banishing Light,EOE,normal,no,common,1,0.02,poor,en,Poor
+Banishing Light,EOE,t,no,common,1,0.02,near_mint,en,Foil (t)
+Banishing Light,EOE,true,no,common,1,0.02,near_mint,en,Foil (true)
+Banishing Light,EOE,1,no,common,1,0.02,near_mint,en,Foil (1)
+Banishing Light,EOE,y,no,common,1,0.02,near_mint,en,Foil (y)
+Banishing Light,EOE,yes,no,common,1,0.02,near_mint,en,Foil (yes)
+Banishing Light,EOE,foil,no,common,1,0.02,near_mint,en,Foil (foil)
+Banishing Light,EOE,normal,t,common,1,0.02,near_mint,en,Signed (t)
+Banishing Light,EOE,normal,true,common,1,0.02,near_mint,en,Signed (true)
+Banishing Light,EOE,normal,1,common,1,0.02,near_mint,en,Signed (1)
+Banishing Light,EOE,normal,y,common,1,0.02,near_mint,en,Signed (y)
+Banishing Light,EOE,normal,yes,common,1,0.02,near_mint,en,Signed (yes)
+Banishing Light,EOE,normal,signed,common,1,0.02,near_mint,en,Signed (signed)
+Banishing Light,EOE,normal,no,common,1,0.02,near_mint,fr,French
+Banishing Light,EOE,normal,no,common,1,0.02,near_mint,de,German
+Banishing Light,EOE,normal,no,common,1,0.02,near_mint,es,Spanish
+Banishing Light,EOE,normal,no,common,1,0.02,near_mint,it,Italian
+Banishing Light,EOE,normal,no,common,1,0.02,near_mint,ja,Japanese
+"Tezzeret, Cruel Captain",EOE,normal,no,mythic,1,0.02,near_mint,en,"Mythic, comma"
+Anticausal Vestige,EOE,normal,no,rare,1,0.02,near_mint,en,Rare
+All-Fates Stalker,EOE,normal,no,uncommon,1,0.02,near_mint,en,Uncommon
+Banishing Light,BLB,normal,no,common,1,0.02,near_mint,en,Different set
+Abandon Hope,TMP,normal,no,uncommon,1,0.02,near_mint,en,Unrelated card

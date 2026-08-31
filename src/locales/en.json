@@ -77,9 +77,6 @@
                     "condition": {
                         "label": "Condition Column"
                     },
-                    "isSigned": {
-                        "label": "Signed Column"
-                    },
                     "comment": {
                         "label": "Comment Column"
                     },
@@ -95,7 +92,6 @@
                     "name": "Name",
                     "language": "Language",
                     "condition": "Condition",
-                    "isSigned": "Signed",
                     "comment": "Comment",
                     "quantity": "Quantity",
                     "price": "Price"
@@ -108,11 +104,15 @@
                     },
                     "isFoil": {
                         "label": "Foil Column"
+                    },
+                    "isSigned": {
+                        "label": "Signed Column"
                     }
                 },
                 "selectRowsFormTable": {
                     "set": "Set",
-                    "isFoil": "Foil"
+                    "isFoil": "Foil",
+                    "isSigned": "Signed"
                 }
             }
         }

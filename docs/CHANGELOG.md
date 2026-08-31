@@ -2,6 +2,12 @@
 
 ## UNRELEASED
 
+### Changes
+- Default name matching was changes to use `Fuse`, as to provide better guesses as to what the rows match when the provided name isn't the exact same as the one in the form. This is specially useful for cases where the `textContent` on the Form as provided by Cardmarket has extra spaces.
+
+### Bugfixes
+- Moved `isSigned` parsing to the MTG Game manager since not all games have it; this fixes crashes on games that didn't have it (like Riftbound).
+
 ### Housekeeping
 - Upgraded engines:
   - `node`: `24.18.0` -> `24.20.0`.

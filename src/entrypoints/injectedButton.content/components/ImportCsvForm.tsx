@@ -113,13 +113,6 @@ function ImportCsvForm({ onSubmit }: ImportCsvFormProps) {
       />
       <ColumnSelect
         control={control}
-        formId="importCsvForm.isSigned"
-        name="isSigned"
-        label={i18n.t('injectedButton.gameManagers.common.importCsvForm.isSigned.label')}
-        options={csvColumns}
-      />
-      <ColumnSelect
-        control={control}
         formId="importCsvForm.comment"
         name="comment"
         label={i18n.t('injectedButton.gameManagers.common.importCsvForm.comment.label')}

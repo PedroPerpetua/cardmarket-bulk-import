@@ -4,7 +4,6 @@ import * as yup from 'yup';
 import { compareNormalized } from '../../../../utils';
 import type { TranslationKey } from '../../../../utils';
 import { readCsv } from '../../../../utils/csv';
-import { parseBoolean } from '../utils';
 import { matchCondition } from '../utils/condition';
 import type { ConditionData } from '../utils/condition';
 import {
@@ -15,7 +14,6 @@ import {
   languageElSelector,
   priceElSelector,
   quantityElSelector,
-  signedElSelector,
 } from '../utils/html';
 import { matchLanguage } from '../utils/language';
 import type { LanguageData } from '../utils/language';
@@ -24,7 +22,6 @@ export type BaseColumnMapping = {
   name: string,
   language: string | undefined,
   condition: string | undefined,
-  isSigned: string | undefined,
   comment: string | undefined,
   quantity: string | undefined,
   price: string | undefined,
@@ -44,7 +41,6 @@ export type CommonParsedRowFields = {
     matched: boolean,
     data: ConditionData,
   },
-  isSigned: boolean,
   comment: string,
   quantity: number,
   price: number,
@@ -147,8 +143,6 @@ class GenericGameManager<
       },
       language,
       condition,
-      isSigned: !!columnMapping.isSigned
-        && parseBoolean(String(rawRowData[columnMapping.isSigned]), ['signed']),
       comment: columnMapping.comment ? String(rawRowData[columnMapping.comment]) : '',
       quantity: columnMapping.quantity ? (Number(rawRowData[columnMapping.quantity]) || 0) : 0,
       price: columnMapping.price ? (Number(rawRowData[columnMapping.price]) || 0) : 0,
@@ -194,7 +188,6 @@ class GenericGameManager<
   ): Promise<HTMLTableRowElement> {
     let languageEl: HTMLSelectElement = trEl.querySelector(languageElSelector)!;
     let conditionEl: HTMLSelectElement = trEl.querySelector(conditionElSelector)!;
-    let signedEl: HTMLInputElement = trEl.querySelector(signedElSelector)!;
     let commentEl: HTMLInputElement = trEl.querySelector(commentElSelector)!;
     let quantityEl: HTMLInputElement = trEl.querySelector(quantityElSelector)!;
     let priceEl: HTMLInputElement = trEl.querySelector(priceElSelector)!;
@@ -210,8 +203,6 @@ class GenericGameManager<
       languageEl.value = languageEl.options[0]!.value;
       conditionEl = resolvedEl.querySelector(conditionElSelector)!;
       conditionEl.value = conditionEl.options[1]!.value; // 1 for NM default
-      signedEl = resolvedEl.querySelector(signedElSelector)!;
-      signedEl.value = signedEl.defaultValue;
       commentEl = resolvedEl.querySelector(commentElSelector)!;
       commentEl.value = commentEl.defaultValue;
       quantityEl = resolvedEl.querySelector(quantityElSelector)!;
@@ -222,7 +213,6 @@ class GenericGameManager<
     // Now input the data
     languageEl.value = row.language.data.mkmValue.toString();
     conditionEl.value = row.condition.data.mkmValue.toString();
-    signedEl.checked = row.isSigned;
     commentEl.value = row.comment;
     quantityEl.value = row.quantity.toString();
     priceEl.value = row.price.toFixed(2);

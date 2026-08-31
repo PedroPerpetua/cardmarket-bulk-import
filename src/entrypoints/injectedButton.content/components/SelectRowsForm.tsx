@@ -143,9 +143,6 @@ function SelectRowsForm({ rows, onSubmit }: SelectRowsFormProps) {
                 })
               }
               <th className="col">
-                { i18n.t('injectedButton.gameManagers.common.selectRowsFormTable.isSigned') }
-              </th>
-              <th className="col">
                 { i18n.t('injectedButton.gameManagers.common.selectRowsFormTable.comment') }
               </th>
               <th className="col">
@@ -242,7 +239,6 @@ function SelectRowsForm({ rows, onSubmit }: SelectRowsFormProps) {
                         return (<td key={k}>{ String(value) }</td>);
                       })
                   }
-                  <td><Checkmark value={r.isSigned} /></td>
                   <td>
                     {
                       r.comment && (
@@ -269,7 +265,6 @@ function SelectRowsForm({ rows, onSubmit }: SelectRowsFormProps) {
                         <td key={k}>&nbsp;</td>
                       ))
                   }
-                  <td>&nbsp;</td>
                   <td>&nbsp;</td>
                   <td>&nbsp;</td>
                   <td>&nbsp;</td>
