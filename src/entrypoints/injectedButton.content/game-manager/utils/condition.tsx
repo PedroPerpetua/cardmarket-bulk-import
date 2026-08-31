@@ -85,7 +85,7 @@ export const mkmConditions: ConditionData[] = [
   },
 ];
 
-const fallback = mkmConditions[1]; // Near mint
+const fallback = mkmConditions[1]!; // Near mint
 
 function matchConditionImpl(inputCondition?: string): { matched: boolean, data: ConditionData } {
   if (!inputCondition) return { matched: false, data: fallback };

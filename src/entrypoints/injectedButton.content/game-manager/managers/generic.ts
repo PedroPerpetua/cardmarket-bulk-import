@@ -215,9 +215,9 @@ class GenericGameManager<
       resolvedEl = trEl.previousSibling as HTMLTableRowElement;
       // We need to point the fields to those of the new parent trEl and reset them
       languageEl = resolvedEl.querySelector(languageElSelector)!;
-      languageEl.value = languageEl.options[0].value;
+      languageEl.value = languageEl.options[0]!.value;
       conditionEl = resolvedEl.querySelector(conditionElSelector)!;
-      conditionEl.value = conditionEl.options[1].value; // 1 for NM default
+      conditionEl.value = conditionEl.options[1]!.value; // 1 for NM default
       signedEl = resolvedEl.querySelector(signedElSelector)!;
       signedEl.value = signedEl.defaultValue;
       commentEl = resolvedEl.querySelector(commentElSelector)!;

@@ -60,7 +60,7 @@ function ImportCsvForm({ onSubmit }: ImportCsvFormProps) {
   const submitFn = handleSubmit(async (data) => {
     const { files, ...mapping } = data;
     try {
-      const res = await gameManager.parseCsv(files[0], mapping);
+      const res = await gameManager.parseCsv(files[0]!, mapping);
       onSubmit(res);
     }
     catch (e) {

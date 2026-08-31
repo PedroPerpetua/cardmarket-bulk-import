@@ -27,17 +27,17 @@ const matchSetToCardmarketId = memoize(matchSetToCardmarketIdImpl);
 const foilElSelector = 'td input[name^="isFoil"]';
 
 class MtgGameManager extends GenericGameManager<'set' | 'isFoil', { set: string, isFoil: boolean }> {
-  extraColumns: Record<'set' | 'isFoil', TranslationKey> = {
+  override extraColumns: Record<'set' | 'isFoil', TranslationKey> = {
     set: 'injectedButton.gameManagers.mtg.importCsvForm.set.label',
     isFoil: 'injectedButton.gameManagers.mtg.importCsvForm.isFoil.label',
   };
 
-  extraValidationSchema = yup.object({
+  override extraValidationSchema = yup.object({
     set: yup.string(),
     isFoil: yup.string(),
   });
 
-  async parseRow(
+  override async parseRow(
     id: number,
     rawRowData: Record<string, unknown>,
     columnMapping: BaseColumnMapping & { set: string | undefined, isFoil: string | undefined },
@@ -65,7 +65,7 @@ class MtgGameManager extends GenericGameManager<'set' | 'isFoil', { set: string,
     };
   }
 
-  async fillRow(
+  override async fillRow(
     trEl: HTMLTableRowElement,
     row: (CommonParsedRowFields & { set: string, isFoil: boolean }),
   ): Promise<HTMLTableRowElement> {
@@ -75,7 +75,7 @@ class MtgGameManager extends GenericGameManager<'set' | 'isFoil', { set: string,
     return resolvedEl;
   };
 
-  extraTableColumns: Record<'set' | 'isFoil', TranslationKey> = {
+  override extraTableColumns: Record<'set' | 'isFoil', TranslationKey> = {
     set: 'injectedButton.gameManagers.mtg.selectRowsFormTable.set',
     isFoil: 'injectedButton.gameManagers.mtg.selectRowsFormTable.isFoil',
   };
