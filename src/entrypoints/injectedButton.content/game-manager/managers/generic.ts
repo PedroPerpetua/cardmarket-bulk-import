@@ -1,6 +1,7 @@
+import Fuse from 'fuse.js';
 import * as yup from 'yup';
 
-import { compareNormalized, normalizeString } from '../../../../utils';
+import { compareNormalized } from '../../../../utils';
 import type { TranslationKey } from '../../../../utils';
 import { readCsv } from '../../../../utils/csv';
 import { parseBoolean } from '../utils';
@@ -9,6 +10,7 @@ import type { ConditionData } from '../utils/condition';
 import {
   commentElSelector,
   conditionElSelector,
+  getFormNames,
   getWebsiteRows,
   languageElSelector,
   priceElSelector,
@@ -93,28 +95,18 @@ class GenericGameManager<
    * @function matchName
    * This function takes a variable number of arguments (so subclasses can pass whatever information
    * they need) and returns whichever name on the form it matched, or null if it matched none.
+   * By default uses Fuse matching to match the row.
    * @param args List of string arguments to use to match the name.
    * @returns The matched name on the form, or null if none was matched.
    */
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   matchName(arg0: string, ...args: string[]): Promise<string | null> {
     const parsedName = arg0;
-    let matchedName = null;
-    for (const row of getWebsiteRows()) {
-      const rowName = row.textContent;
-      // Look for a translated name besides it
-      const translatedName = row.nextSibling?.textContent ?? '';
-      if (compareNormalized(rowName, parsedName) || compareNormalized(translatedName, parsedName)) {
-        return Promise.resolve(rowName);
-      }
-
-      // If we don't find an exact match, look for the last one that contains it
-      if (
-        normalizeString(rowName).includes(normalizeString(parsedName))
-        || normalizeString(translatedName).includes(normalizeString(parsedName))
-      ) matchedName = rowName;
-    }
-    return Promise.resolve(matchedName);
+    const formNames = getFormNames();
+    // Fuse match it
+    const fuse = new Fuse(Object.keys(formNames));
+    const search = fuse.search(parsedName);
+    return Promise.resolve(formNames[search.at(0)?.item ?? ''] ?? null);
   };
 
   /**
