@@ -1,5 +1,5 @@
 import babel from '@rolldown/plugin-babel';
-import react, { reactCompilerPreset } from '@vitejs/plugin-react';
+import { reactCompilerPreset } from '@vitejs/plugin-react';
 import { nodePolyfills } from 'vite-plugin-node-polyfills';
 import { defineConfig } from 'wxt';
 
@@ -27,7 +27,6 @@ export default defineConfig({
   imports: false,
   vite: () => ({
     plugins: [
-      react(),
       nodePolyfills(),
       babel({ presets: [reactCompilerPreset()] }),
     ],
