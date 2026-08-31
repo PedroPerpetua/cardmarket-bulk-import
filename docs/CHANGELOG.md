@@ -1,5 +1,33 @@
 # Changelog
 
+## [1.4.3] 2026-08-31
+
+### Changes
+- Default name matching was changes to use `Fuse`, as to provide better guesses as to what the rows match when the provided name isn't the exact same as the one in the form. This is specially useful for cases where the `textContent` on the Form as provided by Cardmarket has extra spaces.
+
+### Bugfixes
+- Moved `isSigned` parsing to the MTG Game manager since not all games have it; this fixes crashes on games that didn't have it (like Riftbound).
+
+### Housekeeping
+- Upgraded engines:
+  - `node`: `24.18.0` -> `24.20.0`.
+  - `yarn`: `4.17.1` -> `4.18.0`.
+- Upgraded dependencies:
+  - `@hookform/resolvers`: `5.4.0` -> `5.9.1`.
+  - `@wxt-dev/auto-icons`: `1.1.1` -> `1.1.2`.
+  - `@wxt-dev/i18n`: `0.2.6` -> `0.2.7`.
+  - `csv-parse`: `7.0.1` -> `7.0.2`.
+  - `react-hook-form`: `7.82.0` -> `7.86.0`.
+  - `@eslint-react/eslint-plugin`: `5.17.3` -> `5.18.6`.
+  - `@types/react`: `19.2.17` -> `19.2.18`.
+  - `@types/react-dom`: `19.2.3` -> `19.2.5`.
+  - `eslint`: `10.7.0` -> `10.9.1`.
+  - `eslint-plugin-react-refresh`: `0.5.3` -> `0.5.5`.
+  - `typescript-eslint`: `8.65.0` -> `8.68.0`.
+  - `wxt`: `0.20.27` -> `0.21.4`.
+    - `vite` added at version `8.2.2` as it's no longer a direct dependency of `wxt`.
+
+
 ## [1.4.2] 2026-07-24
 
 ### Changes

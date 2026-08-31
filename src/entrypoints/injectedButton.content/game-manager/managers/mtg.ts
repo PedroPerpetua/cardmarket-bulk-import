@@ -25,22 +25,29 @@ async function matchSetToCardmarketIdImpl(set: string) {
 const matchSetToCardmarketId = memoize(matchSetToCardmarketIdImpl);
 
 const foilElSelector = 'td input[name^="isFoil"]';
+export const signedElSelector = 'td input[name^="isSigned"]';
 
-class MtgGameManager extends GenericGameManager<'set' | 'isFoil', { set: string, isFoil: boolean }> {
-  extraColumns: Record<'set' | 'isFoil', TranslationKey> = {
+// NOTE: Signed & Foil fields are shared with _some_ games. Ideally we generalize them somehow.
+type MtgExtraFields = 'set' | 'isFoil' | 'isSigned';
+type MtgExtraFieldsType = { set: string, isFoil: boolean, isSigned: boolean };
+
+class MtgGameManager extends GenericGameManager<MtgExtraFields, MtgExtraFieldsType> {
+  override extraColumns: Record<MtgExtraFields, TranslationKey> = {
     set: 'injectedButton.gameManagers.mtg.importCsvForm.set.label',
     isFoil: 'injectedButton.gameManagers.mtg.importCsvForm.isFoil.label',
+    isSigned: 'injectedButton.gameManagers.mtg.importCsvForm.isSigned.label',
   };
 
-  extraValidationSchema = yup.object({
+  override extraValidationSchema = yup.object({
     set: yup.string(),
     isFoil: yup.string(),
+    isSigned: yup.string(),
   });
 
-  async parseRow(
+  override async parseRow(
     id: number,
     rawRowData: Record<string, unknown>,
-    columnMapping: BaseColumnMapping & { set: string | undefined, isFoil: string | undefined },
+    columnMapping: BaseColumnMapping & Record<MtgExtraFields, string | undefined>,
   ) {
     const parsedData = await super.parseRow(id, rawRowData, columnMapping);
     let set = columnMapping.set ? String(rawRowData[columnMapping.set]) : '';
@@ -61,23 +68,28 @@ class MtgGameManager extends GenericGameManager<'set' | 'isFoil', { set: string,
       set,
       isFoil: !!columnMapping.isFoil
         && parseBoolean(String(rawRowData[columnMapping.isFoil]), ['foil']),
+      isSigned: !!columnMapping.isSigned
+        && parseBoolean(String(rawRowData[columnMapping.isSigned]), ['signed']),
       enabled,
     };
   }
 
-  async fillRow(
+  override async fillRow(
     trEl: HTMLTableRowElement,
-    row: (CommonParsedRowFields & { set: string, isFoil: boolean }),
+    row: (CommonParsedRowFields & MtgExtraFieldsType),
   ): Promise<HTMLTableRowElement> {
     const resolvedEl = await super.fillRow(trEl, row);
     const foilEl: HTMLInputElement = resolvedEl.querySelector(foilElSelector)!;
     foilEl.checked = row.isFoil;
+    const signedEl: HTMLInputElement = resolvedEl.querySelector(signedElSelector)!;
+    signedEl.checked = row.isSigned;
     return resolvedEl;
   };
 
-  extraTableColumns: Record<'set' | 'isFoil', TranslationKey> = {
+  override extraTableColumns: Record<MtgExtraFields, TranslationKey> = {
     set: 'injectedButton.gameManagers.mtg.selectRowsFormTable.set',
     isFoil: 'injectedButton.gameManagers.mtg.selectRowsFormTable.isFoil',
+    isSigned: 'injectedButton.gameManagers.mtg.selectRowsFormTable.isSigned',
   };
 };
 

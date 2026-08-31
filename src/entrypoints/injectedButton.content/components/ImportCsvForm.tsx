@@ -60,7 +60,7 @@ function ImportCsvForm({ onSubmit }: ImportCsvFormProps) {
   const submitFn = handleSubmit(async (data) => {
     const { files, ...mapping } = data;
     try {
-      const res = await gameManager.parseCsv(files[0], mapping);
+      const res = await gameManager.parseCsv(files[0]!, mapping);
       onSubmit(res);
     }
     catch (e) {
@@ -109,13 +109,6 @@ function ImportCsvForm({ onSubmit }: ImportCsvFormProps) {
         formId="importCsvForm.condition"
         name="condition"
         label={i18n.t('injectedButton.gameManagers.common.importCsvForm.condition.label')}
-        options={csvColumns}
-      />
-      <ColumnSelect
-        control={control}
-        formId="importCsvForm.isSigned"
-        name="isSigned"
-        label={i18n.t('injectedButton.gameManagers.common.importCsvForm.isSigned.label')}
         options={csvColumns}
       />
       <ColumnSelect
