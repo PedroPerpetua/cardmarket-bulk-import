@@ -2,7 +2,7 @@
   "name": "cardmarket-bulk-import",
   "description": "Extension to fill in Cardmarket's Bulk Listing form with a CSV file.",
   "private": true,
-  "version": "1.4.3",
+  "version": "1.4.4",
   "type": "module",
   "scripts": {
     "lint": "tsc -b; eslint --fix",

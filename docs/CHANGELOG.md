@@ -1,6 +1,6 @@
 # Changelog
 
-## UNRELEASED
+## [1.4.4] 2026-09-05
 
 ## Changes
 - Added warnings/disclaimers for users to double check the filled data.
