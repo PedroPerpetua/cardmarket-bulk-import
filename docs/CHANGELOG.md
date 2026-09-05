@@ -4,6 +4,7 @@
 
 ## Changes
 - Added warnings/disclaimers for users to double check the filled data.
+- Improved name column and modal display when selecting rows.
 
 ### Bugfixes
 - Fuzzy matching of names is now much more strict; it should not longer randomly match names that don't even look similar.

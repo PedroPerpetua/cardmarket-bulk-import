@@ -105,10 +105,10 @@ class GenericGameManager<
       { useTokenSearch: true, ignoreDiacritics: true, includeScore: true },
     );
     const search = fuse.search(parsedName);
-    // Threshold option in Fuse does not appear to work with TokenSearch, but we want 0.1
+    // Threshold option in Fuse does not appear to work with TokenSearch, but we want 0.2
     const bestMatch = search.at(0);
-    if (!bestMatch || bestMatch.score! > 0.1) return Promise.resolve(null);
-    return Promise.resolve(bestMatch.item);
+    if (!bestMatch || bestMatch.score! > 0.2) return Promise.resolve(null);
+    return Promise.resolve(formNames[bestMatch.item]!);
   };
 
   /**

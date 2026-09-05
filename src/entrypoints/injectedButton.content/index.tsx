@@ -3,6 +3,7 @@ import { createIntegratedUi, defineContentScript } from '#imports';
 import { createRoot } from 'react-dom/client';
 
 import App from './App';
+import './style.css';
 
 export default defineContentScript({
   matches: ['*://*.cardmarket.com/*/*/Stock/ListingMethods/BulkListing*'],

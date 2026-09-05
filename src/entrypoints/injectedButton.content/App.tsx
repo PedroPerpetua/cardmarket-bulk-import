@@ -41,7 +41,13 @@ function App() {
         <Image src={IconTransparent} height={18} />
         <span>{ i18n.t('injectedButton.button') }</span>
       </Button>
-      <Modal size={importedRows !== null ? 'xl' : 'sm'} show={show} onHide={() => setShow(false)}>
+      <Modal
+        size={importedRows !== null ? 'xl' : 'sm'}
+        show={show}
+        onHide={() => setShow(false)}
+        dialogClassName="cardmarket-bulk-import-dialog"
+        centered
+      >
         <Modal.Header closeButton>
           <Modal.Title>{ i18n.t('injectedButton.modal.title') }</Modal.Title>
         </Modal.Header>
