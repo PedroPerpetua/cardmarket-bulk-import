@@ -45,7 +45,7 @@ function App() {
         size={importedRows !== null ? 'xl' : 'sm'}
         show={show}
         onHide={() => setShow(false)}
-        dialogClassName="cardmarket-bulk-import-dialog"
+        dialogClassName="mt-0 mb-0 vh-100"
         centered
       >
         <Modal.Header closeButton>
