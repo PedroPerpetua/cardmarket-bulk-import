@@ -2,6 +2,9 @@
 
 ## UNRELEASED
 
+## Changes
+- Added warnings/disclaimers for users to double check the filled data.
+
 ### Bugfixes
 - Fuzzy matching of names is now much more strict; it should not longer randomly match names that don't even look similar.
 - Fixed inaccurate MTG set matching issue with matching a `matchName` of an incorrect set (like `PEOE` matching `EOE` first).

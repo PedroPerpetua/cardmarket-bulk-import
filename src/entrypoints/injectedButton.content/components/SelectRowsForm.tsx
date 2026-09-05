@@ -8,6 +8,7 @@ import { Controller, useForm, useWatch } from 'react-hook-form';
 import * as yup from 'yup';
 
 import Checkmark from './Checkmark';
+import ErrorText from './ErrorText';
 import { setInArray, splitIntoBatches } from '../../../utils';
 import usePaginatedArray from '../../../utils/usePaginatedArray';
 import type { ParsedRow } from '../game-manager';
@@ -313,9 +314,14 @@ function SelectRowsForm({ rows, onSubmit }: SelectRowsFormProps) {
                 )
               : <div>{/* Empty div for the stack's justify content */}</div>
           }
-          <Button type="submit">
-            { i18n.t('injectedButton.modal.selectRowsForm.submit') }
-          </Button>
+          <Stack gap={2} direction="horizontal" className="align-items-center">
+            <ErrorText className="fs-6 fw-bold">
+              {i18n.t('injectedButton.modal.selectRowsForm.doubleCheckWarning')}
+            </ErrorText>
+            <Button type="submit" className="text-nowrap">
+              { i18n.t('injectedButton.modal.selectRowsForm.submit') }
+            </Button>
+          </Stack>
         </Stack>
       </Stack>
     </Form>

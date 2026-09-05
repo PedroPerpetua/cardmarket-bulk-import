@@ -23,7 +23,9 @@ function SuccessAlert({ count, onDismiss }: SuccessAlertProps) {
         <span className="fonticon-check-circle alert-icon" />
         <div className="alert-content">
           <Alert.Heading>
-            { count.toString() + i18n.t('injectedButton.modal.successAlert_a') }
+            { `${count.toString()} ${i18n.t('injectedButton.modal.successAlert_a')}` }
+            {' '}
+            <b>{i18n.t('injectedButton.modal.successAlert_b')}</b>
           </Alert.Heading>
         </div>
       </Alert>

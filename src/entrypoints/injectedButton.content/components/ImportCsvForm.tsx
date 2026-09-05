@@ -7,6 +7,7 @@ import { useForm, useWatch } from 'react-hook-form';
 import * as yup from 'yup';
 
 import ColumnSelect from './ColumnSelect';
+import ErrorText from './ErrorText';
 import { getCsvColumns } from '../../../utils/csv';
 import useAsyncFn from '../../../utils/useAsyncFn';
 import type { ParsedRow } from '../game-manager';
@@ -168,17 +169,7 @@ function ImportCsvForm({ onSubmit }: ImportCsvFormProps) {
           </Form.Control.Feedback>
         </Form.Group>
         { columnsEl }
-        {
-          formErrors.root && (
-            <>
-              { /* Bootstrap invalid-feedback requires an .is-invalid sibling */ }
-              <div className="is-invalid d-none" />
-              <div className="invalid-feedback mt-0">
-                { formErrors.root.message }
-              </div>
-            </>
-          )
-        }
+        {formErrors.root && (<ErrorText>{ formErrors.root.message }</ErrorText>)}
       </Stack>
     </Form>
   );
