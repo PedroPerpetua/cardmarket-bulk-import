@@ -8,6 +8,8 @@ import { Controller, useForm, useWatch } from 'react-hook-form';
 import * as yup from 'yup';
 
 import Checkmark from './Checkmark';
+import ErrorText from './ErrorText';
+import NameColumnContent from './NameColumnContent';
 import { setInArray, splitIntoBatches } from '../../../utils';
 import usePaginatedArray from '../../../utils/usePaginatedArray';
 import type { ParsedRow } from '../game-manager';
@@ -179,39 +181,8 @@ function SelectRowsForm({ rows, onSubmit }: SelectRowsFormProps) {
                       )}
                     />
                   </td>
-                  <td className={clsx({ 'p-0 lh-1': r.matchedName && r.matchedName !== r.name })}>
-                    <OverlayTrigger
-                      overlay={(
-                        <Tooltip>
-                          { i18n.t('injectedButton.modal.selectRowsForm.nameMatchedWarning') }
-                        </Tooltip>
-                      )}
-                      trigger={r.enabled ? [] : undefined}
-                      placement="left"
-                    >
-                      <span className={clsx(!!r.name.matchedName && !r.enabled && 'text-warning')}>
-                        { r.name.value }
-                      </span>
-                    </OverlayTrigger>
-                    {
-                      r.name.matchedName && r.name.matchedName !== r.name.value && (
-                        <>
-                          <br />
-                          <OverlayTrigger
-                            overlay={(
-                              <Tooltip>
-                                { i18n.t('injectedButton.modal.selectRowsForm.nameMatchedTooltip') }
-                              </Tooltip>
-                            )}
-                            placement="left"
-                          >
-                            <span className="text-light" style={{ fontSize: '0.75rem' }}>
-                              { r.name.matchedName }
-                            </span>
-                          </OverlayTrigger>
-                        </>
-                      )
-                    }
+                  <td>
+                    <NameColumnContent row={r} />
                   </td>
                   <td>
                     <OverlayTrigger overlay={(<Tooltip>{ r.language.data.mkmLabels[0] }</Tooltip>)}>
@@ -313,9 +284,14 @@ function SelectRowsForm({ rows, onSubmit }: SelectRowsFormProps) {
                 )
               : <div>{/* Empty div for the stack's justify content */}</div>
           }
-          <Button type="submit">
-            { i18n.t('injectedButton.modal.selectRowsForm.submit') }
-          </Button>
+          <Stack gap={2} direction="horizontal" className="align-items-center">
+            <ErrorText className="fs-6 fw-bold">
+              {i18n.t('injectedButton.modal.selectRowsForm.doubleCheckWarning')}
+            </ErrorText>
+            <Button type="submit" className="text-nowrap">
+              { i18n.t('injectedButton.modal.selectRowsForm.submit') }
+            </Button>
+          </Stack>
         </Stack>
       </Stack>
     </Form>

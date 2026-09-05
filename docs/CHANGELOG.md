@@ -1,5 +1,24 @@
 # Changelog
 
+## [1.4.4] 2026-09-05
+
+## Changes
+- Added warnings/disclaimers for users to double check the filled data.
+- Improved name column and modal display when selecting rows.
+
+### Bugfixes
+- Fuzzy matching of names is now much more strict; it should not longer randomly match names that don't even look similar.
+- Fixed inaccurate MTG set matching issue with matching a `matchName` of an incorrect set (like `PEOE` matching `EOE` first).
+
+### Housekeeping
+- Upgraded dependencies:
+  - `react-hook-form`: `7.86.0` -> `7.87.0`.
+  - `@eslint-react/eslint-plugin`: `5.18.6` -> `5.18.7`.
+  - `@types/node`: `26.4.0` -> `26.4.1`.
+  - `eslint-plugin-react-refresh`: `0.5.5` -> `0.5.6`.
+  - `typescript-eslint`: `8.68.0` -> `8.69.0`.
+
+
 ## [1.4.3] 2026-08-31
 
 ### Changes

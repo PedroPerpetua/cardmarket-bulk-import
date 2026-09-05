@@ -55,9 +55,11 @@
                 "showDisabled": "Show disabled",
                 "nameMatchedWarning": "This item does not meet all form requirements, but may still be filled",
                 "nameMatchedTooltip": "This item has been matched to this row",
+                "doubleCheckWarning": "Please double check the imported data before filling the page!",
                 "submit": "Fill page!"
             },
-            "successAlert_a": " row(s) filled successfully."
+            "successAlert_a": "row(s) filled successfully.",
+            "successAlert_b": "Please double check the filled form."
         },
         "gameManagers": {
             "common": {
