@@ -1,5 +1,16 @@
 # Changelog
 
+## UNRELEASED
+
+### Housekeeping
+- Upgraded dependencies:
+  - `react-hook-form`: `7.86.0` -> `7.87.0`.
+  - `@eslint-react/eslint-plugin`: `5.18.6` -> `5.18.7`.
+  - `@types/node`: `26.4.0` -> `26.4.1`.
+  - `eslint-plugin-react-refresh`: `0.5.5` -> `0.5.6`.
+  - `typescript-eslint`: `8.68.0` -> `8.69.0`.
+
+
 ## [1.4.3] 2026-08-31
 
 ### Changes
