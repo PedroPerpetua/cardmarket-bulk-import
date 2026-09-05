@@ -17,6 +17,10 @@ const getMTGJSONData = memoize(getMTGJSONDataImpl);
 
 async function matchSetToCardmarketIdImpl(set: string) {
   const sets = await getMTGJSONData();
+  // Search by code first
+  const codeResult = sets.find(({ code }) => compareNormalized(code, set));
+  if (codeResult) return codeResult;
+  // Search on all match keys
   const result = sets.find(({ matchKeys }) => !!matchKeys.find((v) => compareNormalized(v, set)));
   if (result) return { code: result.code, cardmarketId: result.cardmarketId };
   return null;
