@@ -100,9 +100,15 @@ class GenericGameManager<
     const parsedName = arg0;
     const formNames = getFormNames();
     // Fuse match it
-    const fuse = new Fuse(Object.keys(formNames));
+    const fuse = new Fuse(
+      Object.keys(formNames),
+      { useTokenSearch: true, ignoreDiacritics: true, includeScore: true },
+    );
     const search = fuse.search(parsedName);
-    return Promise.resolve(formNames[search.at(0)?.item ?? ''] ?? null);
+    // Threshold option in Fuse does not appear to work with TokenSearch, but we want 0.1
+    const bestMatch = search.at(0);
+    if (!bestMatch || bestMatch.score! > 0.1) return Promise.resolve(null);
+    return Promise.resolve(bestMatch.item);
   };
 
   /**

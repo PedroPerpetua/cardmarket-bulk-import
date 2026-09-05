@@ -2,6 +2,9 @@
 
 ## UNRELEASED
 
+### Bugfixes
+- Fuzzy matching of names is now much more strict; it should not longer randomly match names that don't even look similar.
+
 ### Housekeeping
 - Upgraded dependencies:
   - `react-hook-form`: `7.86.0` -> `7.87.0`.
