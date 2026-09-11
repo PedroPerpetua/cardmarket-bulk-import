@@ -12,7 +12,7 @@ function readCsvImpl(file: File) {
       }
       parse(
         evt.target.result,
-        { columns: true, skipEmptyLines: true },
+        { columns: true, skipEmptyLines: true, bom: true },
         (err, records: Record<string, unknown>[], info) => {
           if (err) reject(err);
           if (!Array.isArray(info?.columns)) {
