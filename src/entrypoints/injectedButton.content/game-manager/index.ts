@@ -1,5 +1,6 @@
 import GenericGameManager from './managers/generic';
 import MtgGameManager from './managers/mtg';
+import PokemonGameManager from './managers/pokemon';
 import type { ArrayElement } from '../../../utils';
 
 // Utility type to shortcut the definition of the base ParsedRow
@@ -15,6 +16,8 @@ export function getCurrentManager(): GenericGameManager {
   switch (location) {
     case 'Magic/Stock/ListingMethods/BulkListing':
       return new MtgGameManager();
+    case 'Pokemon/Stock/ListingMethods/BulkListing':
+      return new PokemonGameManager();
     default:
       return new GenericGameManager();
   }

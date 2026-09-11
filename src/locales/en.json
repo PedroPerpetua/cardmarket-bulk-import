@@ -59,7 +59,8 @@
                 "submit": "Fill page!"
             },
             "successAlert_a": "row(s) filled successfully.",
-            "successAlert_b": "Please double check the filled form."
+            "successAlert_b": "Please double check the filled form.",
+            "fillError": "Could not finish filling the page. Review any rows already filled before trying again."
         },
         "gameManagers": {
             "common": {
@@ -116,7 +117,41 @@
                     "isFoil": "Foil",
                     "isSigned": "Signed"
                 }
+            },
+            "pokemon": {
+                "importCsvForm": {
+                    "rarity": {
+                        "label": "Rarity Column"
+                    },
+                    "isReverseHolo": {
+                        "label": "Reverse Holo Column"
+                    },
+                    "isSigned": {
+                        "label": "Signed Column"
+                    },
+                    "isFirstEd": {
+                        "label": "First Edition Column"
+                    }
+                },
+                "selectRowsFormTable": {
+                    "rarity": "Rarity",
+                    "isReverseHolo": "Reverse Holo",
+                    "isSigned": "Signed",
+                    "isFirstEd": "First Edition",
+                    "issue": "Issue"
+                },
+                "rarityRequired": "Select a rarity column and provide a rarity for this row.",
+                "ambiguous": "Multiple products have this name and rarity. List this variant manually.",
+                "notFound": "No exact name and rarity match on this page.",
+                "unavailableOption": "Invalid or unavailable option: ",
+                "unavailableFields": "Required listing fields are unavailable.",
+                "invalidQuantity": "Quantity must be a positive integer within the limits of this row.",
+                "invalidPrice": "Price must be within the limits of this row.",
+                "invalidBoolean": "Use true/false or 1/0 for: ",
+                "pageChanged": "The selected row is unavailable or ambiguous. Import the CSV again.",
+                "ignoredFlags": "Ignored unavailable fields: "
             }
-        }
+        },
+        "extractCsv": "Extract CSV"
     }
 }
