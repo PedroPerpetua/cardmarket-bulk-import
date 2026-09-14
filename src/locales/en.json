@@ -116,7 +116,30 @@
                     "isFoil": "Foil",
                     "isSigned": "Signed"
                 }
+            },
+            "pokemon": {
+                "importCsvForm": {
+                    "rarity": {
+                        "label": "Rarity Column"
+                    },
+                    "isReverseHolo": {
+                        "label": "Reverse Holo Column"
+                    },
+                    "isSigned": {
+                        "label": "Signed Column"
+                    },
+                    "isFirstEd": {
+                        "label": "First Edition Column"
+                    }
+                },
+                "selectRowsFormTable": {
+                    "rarity": "Rarity",
+                    "isReverseHolo": "Reverse Holo",
+                    "isSigned": "Signed",
+                    "isFirstEd": "First Edition"
+                }
             }
-        }
+        },
+        "extractCsv": "Extract CSV"
     }
 }

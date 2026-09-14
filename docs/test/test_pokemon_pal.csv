@@ -1,0 +1,16 @@
+name,rarity,language,condition,isReverseHolo,isSigned,isFirstEd,quantity,price,comment
+Pawmi (PAL 074),Common,English,NM,false,false,false,1,0.02,Normal Common; must not fill the Promo row.
+Pawmi (PAL 074),Common,English,EX,true,false,false,2,0.03,Reverse Holo; copied Common row with Excellent condition.
+Pawmi (PAL 074),Promo,English,NM,true,true,true,1,0.04,Disabled Reverse Holo and First Edition must be ignored; Signed and other fields still fill.
+Pawmi (PAL 074),Common,Portuguese,GD,0,1,0,1,0.05,"Numeric booleans; Signed checked, Reverse Holo unchecked."
+Pawmi (PAL 074),Common,English,Mint,yes,no,no,1,0.06,Yes/no boolean aliases.
+Pawmi (PAL 074),Common,English,LP,,,,1,0.07,Empty optional flags are false; copied row must not retain prior flags.
+Pawmi (PAL 074),Common,English,PL,false,false,false,1,0.08,Played condition.
+Pawmi (PAL 074),Common,English,PO,false,false,false,1,0.09,Poor condition.
+Pawmi (PAL 074),common,en,NM,TRUE,FALSE,FALSE,1,0.10,Existing normalized matching: lowercase rarity and uppercase boolean.
+Pawmi (PAL 074),Common,English,NM,false,false,false,1,0.11,"CSV escaping: vírgula, ""aspas""; café."
+Pawmi (PAL 074),,English,NM,false,false,false,1,0.02,Must remain unmatched: no rarity.
+Pawmi (PAL 074),Uncommon,English,NM,false,false,false,1,0.02,Must remain unmatched: wrong rarity.
+Pawmi,Common,English,NM,false,false,false,1,0.02,Must remain unmatched: missing set and collector number.
+Tinkaton (PAL 105),Rare,English,NM,false,false,false,1,0.02,Must remain unmatched when two different product links share this pair.
+Not a real card (PAL 999),Common,English,NM,false,false,false,1,0.02,Must remain unmatched: no corresponding product.

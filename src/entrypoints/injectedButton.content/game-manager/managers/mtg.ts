@@ -90,6 +90,16 @@ class MtgGameManager extends GenericGameManager<MtgExtraFields, MtgExtraFieldsTy
     return resolvedEl;
   };
 
+  override extractRow(element: HTMLTableRowElement): Record<string, string> {
+    const foil = element.querySelector<HTMLInputElement>(foilElSelector);
+    const signed = element.querySelector<HTMLInputElement>(signedElSelector);
+    return {
+      ...super.extractRow(element),
+      isFoil: String(!!foil && !foil.disabled && foil.checked),
+      isSigned: String(!!signed && !signed.disabled && signed.checked),
+    };
+  }
+
   override extraTableColumns: Record<MtgExtraFields, TranslationKey> = {
     set: 'injectedButton.gameManagers.mtg.selectRowsFormTable.set',
     isFoil: 'injectedButton.gameManagers.mtg.selectRowsFormTable.isFoil',

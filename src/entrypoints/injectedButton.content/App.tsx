@@ -41,6 +41,21 @@ function App() {
         <Image src={IconTransparent} height={18} />
         <span>{ i18n.t('injectedButton.button') }</span>
       </Button>
+      <Button
+        className="w-100 mt-1"
+        variant="outline-primary"
+        onClick={() => {
+          const blob = new Blob([gameManager.extractCsv()], { type: 'text/csv;charset=utf-8' });
+          const url = URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          link.href = url;
+          link.download = `cardmarket-${Date.now()}.csv`;
+          link.click();
+          setTimeout(() => URL.revokeObjectURL(url), 10000);
+        }}
+      >
+        {i18n.t('injectedButton.extractCsv')}
+      </Button>
       <Modal
         size={importedRows !== null ? 'xl' : 'sm'}
         show={show}

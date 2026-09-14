@@ -128,9 +128,10 @@ class GenericGameManager<
     id: number,
     rawRowData: Record<string, unknown>,
     columnMapping: (BaseColumnMapping & Record<ExtraColumnInputs, string | undefined>),
+    ...matchArgs: string[]
   ): Promise<CommonParsedRowFields & ExtraParsedRowFields> {
     const parsedName = String(rawRowData[columnMapping.name]);
-    const matchedName = await this.matchName(parsedName);
+    const matchedName = await this.matchName(parsedName, ...matchArgs);
     const language = matchLanguage(
       columnMapping.language
         ? rawRowData[columnMapping.language] as string | undefined
@@ -226,6 +227,40 @@ class GenericGameManager<
     return Promise.resolve(resolvedEl);
   }
 
+  /** Resolve a listing row; game managers may use extra identity fields such as rarity. */
+  getRowElement(row: CommonParsedRowFields & ExtraParsedRowFields): HTMLTableRowElement | null {
+    const nameEl = getWebsiteRows().find(
+      (el) => compareNormalized(el.textContent, row.name.matchedName ?? row.name.value),
+    );
+    return nameEl?.closest('tr') ?? null;
+  }
+
+  /** Read common listing fields. Subclasses can append their own export columns. */
+  extractRow(element: HTMLTableRowElement): Record<string, string> {
+    const selected = (selector: string) => element.querySelector<HTMLSelectElement>(selector)
+      ?.selectedOptions[0]?.textContent ?? '';
+    const value = (selector: string) => element.querySelector<HTMLInputElement>(selector)?.value ?? '';
+    return {
+      name: element.querySelector('.col-product a')?.textContent ?? '',
+      language: selected(languageElSelector),
+      condition: selected(conditionElSelector),
+      comment: value(commentElSelector),
+      quantity: value(quantityElSelector),
+      price: value(priceElSelector),
+    };
+  }
+
+  /** Export only the current page, including copied rows and the values currently in the form. */
+  extractCsv(): string {
+    const rows = [...document.querySelectorAll<HTMLTableRowElement>('tbody tr')]
+      .filter((element) => element.querySelector('.col-product a') && element.querySelector(quantityElSelector))
+      .map((element) => this.extractRow(element));
+    const columns = Object.keys(rows[0] ?? this.extractRow(document.createElement('tr')));
+    const quote = (value: string) => `"${value.replace(/"/g, '""')}"`;
+    return '\uFEFF' + [columns, ...rows.map((row) => columns.map((column) => row[column] ?? ''))]
+      .map((row) => row.map(quote).join(',')).join('\r\n') + '\r\n';
+  }
+
   /**
    * @function fillPage
    * This function takes in a list of (selected) ParsedRows and fills the page Cardmarket page with
@@ -234,14 +269,10 @@ class GenericGameManager<
    * @returns The number of rows that were successfully filled in.
    */
   async fillPage(rows: (CommonParsedRowFields & ExtraParsedRowFields)[]): Promise<number> {
-    const websiteRows = getWebsiteRows();
     let count = 0;
     for (const row of rows) {
-      const nameEl = websiteRows.find(
-        (el) => compareNormalized(el.textContent, row.name.matchedName ?? row.name.value),
-      );
-      if (!nameEl) continue;
-      const trEl = nameEl.parentElement!.parentElement!.parentElement! as HTMLTableRowElement;
+      const trEl = this.getRowElement(row);
+      if (!trEl) continue;
       await this.fillRow(trEl, row);
       count += 1;
     };
