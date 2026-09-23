@@ -8,7 +8,8 @@ import * as yup from 'yup';
 
 import ColumnSelect from './ColumnSelect';
 import ErrorText from './ErrorText';
-import { getCsvColumns } from '../../../utils/csv';
+import { getCsvColumns, readTextFromFile } from '../../../utils/csv';
+import type { StoredColumnMapping } from '../../../utils/storage';
 import useAsyncFn from '../../../utils/useAsyncFn';
 import type { ParsedRow } from '../game-manager';
 import useGameManager from '../game-manager/useGameManager';
@@ -39,8 +40,15 @@ const baseValidationSchema: yup.ObjectSchema<BaseImportFormValues> = yup.object(
 
 type ImportFormValues = BaseImportFormValues & Record<string, string | undefined>;
 
+export type ImportCsvFormResult = {
+  rows: ParsedRow[],
+  csvText: string,
+  fileName: string,
+  columnMapping: StoredColumnMapping,
+};
+
 type ImportCsvFormProps = {
-  onSubmit: (data: ParsedRow[]) => void,
+  onSubmit: (data: ImportCsvFormResult) => void,
 };
 
 function ImportCsvForm({ onSubmit }: ImportCsvFormProps) {
@@ -61,8 +69,15 @@ function ImportCsvForm({ onSubmit }: ImportCsvFormProps) {
   const submitFn = handleSubmit(async (data) => {
     const { files, ...mapping } = data;
     try {
-      const res = await gameManager.parseCsv(files[0]!, mapping);
-      onSubmit(res);
+      const file = files[0]!;
+      const csvText = await readTextFromFile(file);
+      const rows = await gameManager.parseCsv(csvText, mapping);
+      onSubmit({
+        rows,
+        csvText,
+        fileName: file.name,
+        columnMapping: mapping,
+      });
     }
     catch (e) {
       console.error('[cardmarket-bulk-import] Failed to Submit CSV file.', e);

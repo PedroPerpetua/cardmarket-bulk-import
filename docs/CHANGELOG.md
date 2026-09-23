@@ -1,5 +1,17 @@
 # Changelog
 
+## [Unreleased]
+
+### Changes
+- The imported CSV is now saved (local storage) and reused across Cardmarket pages, so it only needs to be imported once.
+- The import modal opens automatically on the first visit to a bulk listing page when no CSV is saved.
+- Auto-fill: when arriving on an expansion page with a saved CSV, matching rows are filled automatically, submitted, and the next page is loaded until there are no more pages or the 100 articles per expansion Cardmarket limit is reached. A progress overlay with a Stop button is displayed.
+- Pages in other languages are redirected to `/en/` when a CSV is saved, since name matching relies on English names.
+- New MTG expansion dashboard with tabs: Fill this page / Editions (open the matching expansion pages in new tabs) / Foils (variants that may be separate products) / Unmatched (sets MTGJSON can't map).
+- Filled rows are moved to the top of the Cardmarket table and highlighted.
+- MTG double-faced cards now fall back to matching the front face only.
+- Added a manual fallback table (`mtg-set-fallback.ts`) for MTG sets that MTGJSON has no Cardmarket id for.
+
 ## [1.4.4] 2026-09-05
 
 ## Changes

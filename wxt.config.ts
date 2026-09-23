@@ -21,6 +21,7 @@ export default defineConfig({
         },
       },
     },
+    permissions: ['storage'],
   },
   zip: { sourcesRoot: 'src' },
   srcDir: 'src',

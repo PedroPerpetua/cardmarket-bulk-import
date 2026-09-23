@@ -43,8 +43,35 @@
         "modal": {
             "title": "Import listings from CSV",
             "importCsvForm": {
-                "submit": "Select rows",
+                "submit": "Continue",
                 "error": "An unknown error occurred parsing this file. Please make sure the CSV is correctly formatted."
+            },
+            "editionDashboard": {
+                "title": "Editions in your CSV",
+                "summary_a": " cards matched across ",
+                "summary_b": " editions.",
+                "openAll": "Open all editions in new tabs",
+                "manualSelect": "Manual selection for this page",
+                "openButton": "Open",
+                "reopenButton": "This page",
+                "cardCount": " card(s)",
+                "currentBadge": "Current page",
+                "tab": {
+                    "fillPage": "Fill this page",
+                    "matched": "Editions",
+                    "unmatched": "Unmatched",
+                    "foils": "Foils"
+                },
+                "foilsExplain": "These cards are marked as foil in your CSV. Cardmarket usually has a single product page that handles both foil and non-foil — the extension will tick the Foil checkbox automatically. However, some special promos exist as separate Cardmarket products (Showcase, Borderless, Extended Art, etc.) and may not be matched by name alone. Verify these manually after auto-fill.",
+                "fillPageButton": "Fill page",
+                "fillPageHint": "Fills the current edition with these cards in one click.",
+                "fillPagePartialHint": "Some cards are not visible on the current Cardmarket page.",
+                "fillPageInvisibleWarning": " card(s) belong to this edition but are not visible in the Cardmarket table — change page or filter on Cardmarket to make them appear.",
+                "fillPageRowInvisibleBadge": "Not visible",
+                "fillPageRowInvisibleTooltip": "This card belongs to the current edition but is not visible in the Cardmarket table. Change page or filter to make it appear.",
+                "fillPageEmpty": "No card from your CSV matches the current Cardmarket edition.",
+                "foilBadge": "Foil",
+                "unmatchedExplain": "These cards could not be matched to a known Cardmarket edition (special promos, very old sets, etc.). Find the right edition on Cardmarket and use 'Import CSV...' manually from there."
             },
             "selectRowsForm": {
                 "min": "You must select at least 1 row!",
@@ -60,6 +87,12 @@
             },
             "successAlert_a": "row(s) filled successfully.",
             "successAlert_b": "Please double check the filled form."
+        },
+        "autoFillOverlay": {
+            "title": "Auto-listing in progress",
+            "page": "Page",
+            "cards": "cards",
+            "stop": "Stop"
         },
         "gameManagers": {
             "common": {

@@ -7,6 +7,7 @@ import { readCsv } from '../../../../utils/csv';
 import { matchCondition } from '../utils/condition';
 import type { ConditionData } from '../utils/condition';
 import {
+  bringFilledRowsToTop,
   commentElSelector,
   conditionElSelector,
   getFormNames,
@@ -72,6 +73,8 @@ class GenericGameManager<
     GenericGameManager._instance ??= this as GenericGameManager;
     return GenericGameManager._instance as typeof this;
   }
+
+  gameId = 'generic';
 
   /**
    * @property extraColumns
@@ -160,15 +163,15 @@ class GenericGameManager<
    * @function parseCsv
    * This function is what will be used to transform the columns inputs to the internal ParsedRow
    * structure.
-   * @param file The CSV file that was imported.
+   * @param input The CSV file that was imported, or its raw text content.
    * @param columnMapping The mappings from the property names to the columns in the CSV.
    * @returns A list of ParsedRows from the CSV data.
    */
   async parseCsv(
-    file: File,
+    input: File | string,
     columnMapping: (BaseColumnMapping & Record<ExtraColumnInputs, string | undefined>),
   ): Promise<(CommonParsedRowFields & ExtraParsedRowFields)[]> {
-    const data = await readCsv(file);
+    const data = await readCsv(input);
     const rows = [];
     for (const [i, row] of data.rows.entries()) {
       rows.push(await this.parseRow(i, row, columnMapping));
@@ -235,6 +238,7 @@ class GenericGameManager<
    */
   async fillPage(rows: (CommonParsedRowFields & ExtraParsedRowFields)[]): Promise<number> {
     const websiteRows = getWebsiteRows();
+    const filledTrs: HTMLTableRowElement[] = [];
     let count = 0;
     for (const row of rows) {
       const nameEl = websiteRows.find(
@@ -242,9 +246,11 @@ class GenericGameManager<
       );
       if (!nameEl) continue;
       const trEl = nameEl.parentElement!.parentElement!.parentElement! as HTMLTableRowElement;
-      await this.fillRow(trEl, row);
+      const resolvedEl = await this.fillRow(trEl, row);
+      filledTrs.push(resolvedEl);
       count += 1;
     };
+    bringFilledRowsToTop(filledTrs);
     return Promise.resolve(count);
   };
 

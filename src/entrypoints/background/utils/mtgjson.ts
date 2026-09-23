@@ -30,6 +30,7 @@ async function getMTGJSONDataImpl() {
         .filter((v) => !!v)
         .map((v) => v!.toString()),
       code: set.code!,
+      name: (set.mcmName ?? set.name ?? set.code)!,
       cardmarketId: set.mcmId,
     }));
 }
